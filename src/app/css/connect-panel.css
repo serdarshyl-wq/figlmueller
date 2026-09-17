@@ -1,0 +1,29 @@
+@media (width < 768px) {
+  .connect-heading {
+    @apply order-1 justify-start px-5 pb-[3svh] pt-[10svh];
+  }
+
+  .connect-form {
+    @apply order-2 px-5 pb-[3svh] pt-0;
+  }
+
+  .connect-form .connect-lead {
+    @apply mt-[3svh];
+  }
+
+  .connect-form .connect-form-body {
+    @apply mt-[4svh];
+  }
+
+  .connect-form .connect-fields {
+    gap: 2.2svh;
+  }
+
+  .connect-form .connect-actions {
+    @apply pt-[3svh];
+  }
+
+  .connect-form .connect-close {
+    @apply fixed right-5 top-5 z-20;
+  }
+}

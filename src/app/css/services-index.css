@@ -1,0 +1,224 @@
+@media (width < 768px) {
+
+  .services-hero .hero-row {
+    @apply px-5;
+  }
+
+  .services-stack .service-name {
+    font-size: clamp(30px, 9vw, 44px);
+  }
+
+  .services-enquiries {
+    @apply gap-[5svh] px-5 py-[6svh];
+  }
+
+  .services-enquiries .enquiries-copy {
+    @apply gap-[4svh];
+  }
+
+  .services-enquiries .enquiries-title {
+    font-size: clamp(30px, 9vw, 44px);
+  }
+
+  .services-features.feature-slider {
+    @apply px-5 py-[9svh];
+  }
+
+  .feature-slider .feature-frame {
+    height: clamp(240px, 42svh, 400px);
+  }
+
+  .feature-slider .feature-slide {
+    @apply mt-6;
+  }
+
+  .feature-slider .feature-title {
+    font-size: clamp(20px, 5.4vw, 26px);
+  }
+
+  .feature-slider .feature-copy {
+    font-size: clamp(14px, 3.9vw, 17px);
+  }
+
+  .feature-slider .feature-foot {
+    @apply mt-8;
+  }
+
+  .feature-slider .feature-nav {
+    @apply gap-3;
+  }
+
+  .feature-slider .feature-arrow {
+    @apply size-11;
+  }
+
+  .feature-slider .feature-count {
+    @apply mt-4;
+
+    font-size: clamp(10px, 2.8vw, 12px);
+  }
+}
+
+@media (width < 1280px) {
+
+  .services-hero {
+    height: 100lvh;
+  }
+
+  .services-hero .hero-line {
+    @apply block;
+  }
+
+  .services-stack .stack-pane {
+    height: 100lvh;
+  }
+
+  .services-stack .service-card {
+    @apply h-full w-full;
+  }
+
+  .services-stack .service-caption {
+    @apply bottom-[10svh] gap-5 px-6;
+  }
+
+  .services-enquiries {
+    @apply flex-col items-center justify-center;
+
+    min-height: 0;
+    height: calc(100svh - var(--footer-height, 420px));
+  }
+
+  .services-enquiries .enquiries-aside {
+    @apply static top-auto translate-y-0 justify-center;
+
+    gap: 0.12em;
+  }
+
+  .services-enquiries .enquiries-aside>span {
+    translate: none;
+  }
+
+  .services-enquiries .enquiries-copy {
+    @apply mt-0;
+  }
+
+
+  .services-features.feature-slider {
+    @apply flex flex-col;
+  }
+
+  .feature-slider .feature-frame {
+    @apply w-full;
+  }
+
+  .feature-slider .feature-title {
+    @apply block text-left font-display font-medium uppercase leading-[1.2] tracking-[0.01em] text-black;
+  }
+
+  .feature-slider .feature-copy {
+    @apply mt-4 leading-[1.55] text-black/60;
+  }
+
+  .feature-slider .feature-items {
+    @apply flex flex-col gap-1;
+  }
+
+  .feature-slider .feature-items li {
+    @apply flex gap-2;
+  }
+
+  .feature-slider .feature-items li span:first-child {
+    @apply text-black/30;
+  }
+
+  .feature-slider .feature-foot {
+    @apply flex items-center justify-between gap-4;
+  }
+
+  .feature-slider .feature-nav {
+    @apply ml-auto flex items-center;
+  }
+
+  .feature-slider .feature-arrow {
+    @apply inline-flex cursor-pointer items-center justify-center rounded-full border border-black/15 bg-transparent text-black duration-300 ease-out active:scale-95 active:bg-black active:text-bone;
+
+    transition-property: background-color, color, scale;
+  }
+
+  .feature-slider .feature-count {
+    @apply text-right font-display font-medium uppercase tracking-[0.16em] text-black/35 tabular-nums;
+  }
+}
+
+@media (768px <=width < 1280px) {
+
+  .services-hero .hero-row {
+    --title-fill: 0.75;
+
+    @apply px-10;
+  }
+
+  .services-features .feature-title {
+    font-size: clamp(22px, 2.2vw, 27px);
+  }
+
+  .services-features .feature-copy {
+    font-size: clamp(16px, 1.6vw, 19px);
+  }
+
+  .services-features.feature-slider {
+    @apply px-10 py-[10svh];
+  }
+
+  .feature-slider .feature-frame {
+    height: clamp(300px, 46svh, 520px);
+  }
+
+  .feature-slider .feature-slide {
+    @apply mt-8;
+  }
+
+  .feature-slider .feature-foot {
+    @apply mt-10;
+  }
+
+  .feature-slider .feature-nav {
+    @apply gap-4;
+  }
+
+  .feature-slider .feature-arrow {
+    @apply size-14;
+  }
+
+  .feature-slider .feature-count {
+    @apply mt-5;
+
+    font-size: clamp(12px, 1.15vw, 14px);
+  }
+
+  .services-stack .service-caption {
+    @apply bottom-[12svh] gap-7 px-10;
+  }
+
+  .services-stack .service-name {
+    font-size: clamp(52px, 5.2vw, 66px);
+  }
+
+  .services-stack .card-pill {
+    @apply px-8 py-4;
+
+    font-size: clamp(12px, 1.15vw, 14px);
+  }
+
+  .services-enquiries {
+    @apply gap-[6svh] px-10 py-[7svh];
+  }
+
+  .services-enquiries .enquiries-copy {
+    @apply gap-[5svh];
+  }
+
+  .services-enquiries .enquiries-title {
+    font-size: clamp(46px, 4.6vw, 58px);
+  }
+}

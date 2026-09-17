@@ -1,0 +1,48 @@
+@media (width < 1280px) {
+  .resources-closing {
+    --runway: 1.6;
+  }
+
+  .resources-closing .closing-stack {
+    @apply justify-end pb-[8svh];
+  }
+
+  .resources-closing .closing-line,
+  .resources-closing .closing-word {
+    translate: none;
+  }
+
+  .resources-closing .closing-cta {
+    @apply visible mt-[4svh];
+  }
+
+  .resources-closing .closing-question {
+    font-size: clamp(20px, 5.8vw, 28px);
+  }
+
+  .resources-closing .closing-name {
+    @apply px-5 pt-[4svh];
+  }
+
+  .resources-closing .closing-word {
+    font-size: clamp(26px, 8vw, 42px);
+  }
+}
+
+@media (768px <=width < 1280px) {
+  .resources-closing .closing-stack {
+    @apply pb-[10svh];
+  }
+
+  .resources-closing .closing-question {
+    font-size: clamp(28px, 2.8vw, 34px);
+  }
+
+  .resources-closing .closing-name {
+    @apply px-10 pt-[5svh];
+  }
+
+  .resources-closing .closing-word {
+    font-size: clamp(48px, 5vw, 62px);
+  }
+}

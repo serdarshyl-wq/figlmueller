@@ -1,0 +1,89 @@
+{
+  "hero": {
+    "image": "/ctrine-assets/ctrine-hero-dummy.jpeg",
+    "alt": "The Citrine® mobile production platform",
+    "title": "Citrine® Machine"
+  },
+  "intro": {
+    "title": [
+      "One mobile platform",
+      "Full production system"
+    ],
+    "body": "13m long, 2.5m wide. All major plant units, one trailer. Move it site to site — no dismantling, no reassembly. Faster site prep. Faster commissioning. Easy access for operation, inspection, maintenance."
+  },
+  "blocks": [
+    {
+      "id": "material-storage-and-dosing",
+      "title": "Material Storage & Dosing",
+      "body": "Raw materials, automatically managed. Metered to the exact production recipe. Delivered under controlled conditions. Consistent operation, reliable performance, every batch.",
+      "image": "/ctrine-assets/ctrine-dummy1.jpeg"
+    },
+    {
+      "id": "material-handling",
+      "title": "Material Handling",
+      "body": "Materials move between process stages — controlled, efficient, continuous. Minimal handling loss. Stable production, start to finish.",
+      "image": "/ctrine-assets/ctrine-dummy3.jpeg"
+    },
+    {
+      "id": "mixing-system",
+      "title": "Mixing System",
+      "body": "A high-performance mixing unit at the core. Homogeneous mixture, every cycle. Consistent distribution. Repeatable quality. Automatic discharge on completion.",
+      "image": "/ctrine-assets/ctrine-dummy5.jpeg"
+    },
+    {
+      "id": "water-supply",
+      "title": "Water Supply",
+      "body": "Automatic dosing, matched to production parameters. Accurate. Stable. Consistent final product.",
+      "image": "/ctrine-assets/ctrine-dummy7.jpeg"
+    },
+    {
+      "id": "pneumatic-system",
+      "title": "Pneumatic System",
+      "body": "Compressed air for every automated function. Reliable actuation. Safe, efficient, dependable operation.",
+      "image": "/ctrine-assets/ctrine-dummy9.jpeg"
+    },
+    {
+      "id": "integrated-process-control",
+      "title": "Integrated Process Control",
+      "body": "Handling to discharge, one coordinated system. Reliability. Repeatability. Efficiency. Consistent quality throughout.",
+      "image": "/ctrine-assets/ctrine-dummy11.jpeg"
+    },
+    {
+      "id": "electronic-control",
+      "title": "Electronic Control",
+      "body": "PLC-driven. Automatic or manual, operator's choice. HMI touchscreen — monitor status, set parameters, adjust settings, select mix designs, respond to alarms. Continuous monitoring of weights, storage levels, sequence, performance. Safe. Accurate. Uninterrupted.",
+      "image": "/ctrine-assets/ctrine-dummy13.jpeg"
+    },
+    {
+      "id": "key-advantages",
+      "title": "Key advantages of Citrine®",
+      "items": [
+        "Compact, fully mobile — one trailer",
+        "Easy transport between job sites",
+        "Faster installation and commissioning",
+        "High-accuracy load-cell weighing",
+        "Efficient planetary mixing",
+        "Automatic and manual PLC/HMI control",
+        "Multiple mix designs, stored and ready",
+        "Reduced material loss — weighing, conveying, mixing, discharge",
+        "Easy access for inspection, cleaning, maintenance",
+        "Reliable continuous production, fully integrated"
+      ],
+      "image": "/ctrine-assets/ctrine-dummy15.jpeg"
+    },
+    {
+      "id": "trademark-notice",
+      "title": "Trademark Notice",
+      "body": "Citrine® is a registered trademark, UAE Ministry of Economy and Tourism, Classes 12 and 37. Protected under the scope of its registration certificate.",
+      "image": "/ctrine-assets/ctrine-dummy17.jpeg"
+    }
+  ],
+  "closing": {
+    "title": [
+      "Smarter",
+      "Sustainable",
+      "Cost-effective"
+    ],
+    "body": "Decades of expertise. New technology. Through FIGLMUELLER, that vision becomes machinery, automation, and industrial systems."
+  }
+}

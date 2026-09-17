@@ -1,0 +1,11 @@
+@media (width < 768px) {
+  .hero-intro {
+    @apply h-svh max-h-svh min-h-svh w-full overflow-hidden;
+  }
+
+  .hero-intro .hero-video,
+  .hero-intro .hero-freeze,
+  .hero-intro .hero-still {
+    @apply absolute inset-0 h-full w-full object-cover;
+  }
+}

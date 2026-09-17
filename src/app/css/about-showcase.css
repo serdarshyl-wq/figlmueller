@@ -1,0 +1,71 @@
+@media (width < 1280px) {
+  .about-showcase {
+    @apply px-5 py-[10svh];
+  }
+
+  .about-showcase .showcase-groups {
+    @apply flex flex-col;
+
+    gap: clamp(48px, 13vw, 76px);
+  }
+
+  .about-showcase .showcase-group-title {
+    @apply font-display font-medium uppercase leading-[1.1] tracking-[-0.01em];
+
+    font-size: clamp(20px, 5.6vw, 28px);
+  }
+
+  .about-showcase .showcase-grid {
+    @apply -mx-5 mt-4 grid grid-cols-2;
+
+    gap: clamp(4px, 1.6vw, 8px);
+  }
+
+  .about-showcase .showcase-tile {
+    @apply flex aspect-4/5 items-center justify-center border border-white/10 bg-white/6;
+  }
+
+  .about-showcase .showcase-tile span {
+    @apply font-display font-normal uppercase tracking-[0.2em] text-white/35;
+
+    font-size: clamp(9px, 2.4vw, 11px);
+  }
+
+  .about-showcase .showcase-more {
+    @apply mt-6 inline-flex cursor-pointer items-center justify-center rounded-full border border-white/25 font-display font-medium uppercase tracking-[0.16em] text-white transition-colors duration-300 active:bg-white active:text-black;
+
+    padding: clamp(10px, 3vw, 14px) clamp(22px, 6.5vw, 32px);
+    font-size: clamp(10px, 2.8vw, 12px);
+  }
+}
+
+@media (768px <=width < 1280px) {
+  .about-showcase {
+    @apply px-10 py-[12svh];
+  }
+
+  .about-showcase .showcase-groups {
+    gap: clamp(80px, 9vw, 110px);
+  }
+
+  .about-showcase .showcase-group-title {
+    font-size: clamp(28px, 2.8vw, 36px);
+  }
+
+  .about-showcase .showcase-grid {
+    @apply -mx-10 mt-6 grid-cols-3;
+
+    gap: clamp(6px, 0.9vw, 10px);
+  }
+
+  .about-showcase .showcase-tile span {
+    font-size: clamp(11px, 1.1vw, 13px);
+  }
+
+  .about-showcase .showcase-more {
+    @apply mt-8;
+
+    padding: 15px clamp(30px, 3vw, 38px);
+    font-size: clamp(12px, 1.15vw, 14px);
+  }
+}

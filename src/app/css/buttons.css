@@ -1,0 +1,67 @@
+@media (width < 1280px) {
+
+  .group:hover .pill-fill.pill-fill {
+    clip-path: inset(0 0 0 0 round 9999px);
+  }
+
+  .group:hover .rule-swap.rule-swap {
+    animation: none;
+  }
+
+  .pill-line.pill-line:hover {
+    background-size:
+      100% 100%,
+      0% 100%,
+      100% 100%;
+  }
+
+  .site-pill,
+  .card-pill {
+    @apply justify-center text-center;
+  }
+
+  .site-pill.site-pill:hover,
+  .group:hover .card-pill.card-pill {
+    @apply text-bone;
+  }
+
+  .site-pill {
+    @apply px-7;
+  }
+
+  .card-pill {
+    @apply px-6;
+  }
+
+  .close-pill:hover .close-label {
+    @apply translate-x-0;
+  }
+
+  .close-pill:hover svg:nth-of-type(1) {
+    right: calc(var(--spacing) * 5);
+  }
+
+  .close-pill:hover svg:nth-of-type(2) {
+    left: calc(var(--spacing) * -10);
+  }
+
+  .talk-pill:hover .talk-body {
+    width: var(--pill-idle);
+  }
+
+  .talk-pill:hover .talk-label {
+    @apply visible translate-x-0;
+  }
+
+  .talk-pill:hover .talk-hover {
+    @apply invisible;
+  }
+
+  .talk-pill:hover svg:nth-of-type(1) {
+    right: calc(var(--spacing) * 8);
+  }
+
+  .talk-pill:hover svg:nth-of-type(2) {
+    left: calc(var(--spacing) * -10);
+  }
+}

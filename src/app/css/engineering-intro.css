@@ -1,0 +1,28 @@
+@media (width < 768px) {
+  .engineering-intro {
+    --runway: 2.8;
+  }
+
+  .engineering-intro .part-title {
+    font-size: clamp(30px, 8.6vw, 40px);
+  }
+
+  .engineering-intro .part-what,
+  .engineering-intro .part-experience {
+    font-size: clamp(23px, 6.6vw, 30px);
+  }
+
+  .engineering-intro .part-title,
+  .engineering-intro .part-what,
+  .engineering-intro .part-experience {
+    @apply mx-auto max-w-none text-center;
+  }
+
+  .engineering-intro .part-closer {
+    font-size: clamp(40px, 15vw, 84px);
+  }
+
+  .engineering-intro .part-closer>span {
+    @apply mr-0 block;
+  }
+}

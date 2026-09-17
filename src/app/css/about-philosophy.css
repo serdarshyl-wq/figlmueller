@@ -1,0 +1,52 @@
+@media (width < 1280px) {
+  .about-philosophy {
+    @apply py-[10svh];
+  }
+
+  .about-philosophy .philosophy-band {
+    @apply flex-col items-stretch px-5;
+  }
+
+  .about-philosophy .philosophy-frame {
+    @apply aspect-auto h-[42svh] w-full;
+  }
+
+  .about-philosophy .philosophy-heading {
+    @apply static mt-7 flex-col items-start gap-1;
+
+    inset-inline: auto;
+    font-size: clamp(30px, 9.4vw, 46px);
+  }
+
+  .about-philosophy .philosophy-copy {
+    @apply mt-6 px-5;
+  }
+
+  .about-philosophy .philosophy-body {
+    font-size: clamp(14px, 3.9vw, 18px);
+  }
+}
+
+@media (768px <=width < 1280px) {
+  .about-philosophy .philosophy-band {
+    @apply px-10;
+  }
+
+  .about-philosophy .philosophy-frame {
+    @apply h-[46svh];
+  }
+
+  .about-philosophy .philosophy-heading {
+    @apply mt-9 gap-2;
+
+    font-size: clamp(56px, 5.5vw, 70px);
+  }
+
+  .about-philosophy .philosophy-copy {
+    @apply mt-8 px-10;
+  }
+
+  .about-philosophy .philosophy-body {
+    font-size: clamp(18px, 1.8vw, 22px);
+  }
+}

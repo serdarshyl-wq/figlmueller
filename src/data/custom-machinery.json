@@ -1,0 +1,35 @@
+{
+  "hero": {
+    "image": "/services-assets/services-dummy2.jpeg",
+    "alt": "A Figlmueller custom machine on a construction site",
+    "title": "Custom Machinery"
+  },
+  "intro": {
+    "title": ["Built around your site,", "not a catalogue"],
+    "body": "Custom machinery and technical systems for construction material production and site operation. Every machine engineered to the project."
+  },
+  "blocks": [
+    {
+      "id": "built-around-your-site",
+      "title": "Built Around Your Site, Not a Catalogue",
+      "body": "Custom machinery and technical systems for construction material production and site operation. Every machine engineered to the project — efficiency, mobility, safety, reliability, maintenance, long-term performance.",
+      "items": [
+        "Mobile machinery",
+        "Trailer-mounted systems",
+        "Material handling systems",
+        "Mixing systems",
+        "Weighing & dosing systems",
+        "Site-based production units",
+        "Automation & control upgrades",
+        "Construction-related industrial equipment"
+      ],
+      "image": "/services-assets/custom-machinery-dummy1.jpeg"
+    },
+    {
+      "id": "engineering-first-approach",
+      "title": "Engineering-First Approach",
+      "body": "Every custom requirement starts with the technical picture: site conditions, material behavior, production needs, available space, operating method, maintenance access, long-term use. Practical machinery, built for real project environments.",
+      "image": "/services-assets/custom-machinery-dummy2.jpeg"
+    }
+  ]
+}

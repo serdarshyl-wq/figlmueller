@@ -1,0 +1,43 @@
+@media (width < 1280px) {
+  .citrine-closing {
+    --runway: 2.5;
+  }
+
+  .citrine-closing .closing-pane {
+    @apply px-5 py-[12svh];
+  }
+
+  .citrine-closing .closing-line {
+    @apply block whitespace-normal;
+  }
+
+  .citrine-closing .closing-slot {
+    @apply mr-0 block;
+  }
+
+  .citrine-closing .closing-word {
+    @apply whitespace-nowrap;
+  }
+
+  .citrine-closing .closing-rule {
+    @apply hidden;
+  }
+
+  .citrine-closing .closing-copy {
+    @apply mt-8;
+
+    font-size: clamp(13px, 3.6vw, 16px);
+  }
+}
+
+@media (768px <=width < 1280px) {
+  .citrine-closing .closing-pane {
+    @apply px-10 py-[14svh];
+  }
+
+  .citrine-closing .closing-copy {
+    @apply mt-10;
+
+    font-size: clamp(17px, 1.7vw, 21px);
+  }
+}

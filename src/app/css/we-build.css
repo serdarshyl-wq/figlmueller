@@ -1,0 +1,25 @@
+@media (width < 1280px) {
+  .we-build {
+    --runway: 2;
+  }
+}
+
+@media (768px <=width < 1280px) {
+  .we-build .build-line {
+    font-size: clamp(42px, 5.5vw, 70px);
+  }
+
+  .we-build .site-pill {
+    @apply mt-12 px-10 py-5;
+
+    font-size: clamp(14px, 1.25vw, 16px);
+  }
+
+  .we-build .build-notes {
+    max-width: 62vw;
+  }
+
+  .we-build .build-note {
+    font-size: clamp(15px, 1.5vw, 18px);
+  }
+}

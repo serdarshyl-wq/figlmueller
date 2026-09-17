@@ -1,26 +1,302 @@
 @import "tailwindcss";
+@import "lenis/dist/lenis.css";
+@import "./css/index.css";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --brand-ink: #094c4f;
+  --brand-teal: #007065;
+  --brand-amber: #eba51e;
+  --brand-bone: #f1f0ec;
+  --brand-graphite: #2d2a2a;
+
+  --background: #050505;
+  --foreground: #f5f4f2;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-ink: var(--brand-ink);
+  --color-teal: var(--brand-teal);
+  --color-amber: var(--brand-amber);
+  --color-bone: var(--brand-bone);
+  --font-display: var(--font-clash-grotesk);
+  --font-sans: var(--font-satoshi);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer utilities {
+  .text-black {
+    color: var(--brand-graphite);
+  }
+
+  .text-black\/12 {
+    color: color-mix(in oklab, var(--brand-graphite) 12%, transparent);
+  }
+
+  .text-black\/25 {
+    color: color-mix(in oklab, var(--brand-graphite) 25%, transparent);
+  }
+
+  .text-black\/30 {
+    color: color-mix(in oklab, var(--brand-graphite) 30%, transparent);
+  }
+
+  .text-black\/35 {
+    color: color-mix(in oklab, var(--brand-graphite) 35%, transparent);
+  }
+
+  .text-black\/50 {
+    color: color-mix(in oklab, var(--brand-graphite) 50%, transparent);
+  }
+
+  .text-black\/55 {
+    color: color-mix(in oklab, var(--brand-graphite) 55%, transparent);
+  }
+
+  .text-black\/60 {
+    color: color-mix(in oklab, var(--brand-graphite) 60%, transparent);
+  }
+
+  .text-black\/65 {
+    color: color-mix(in oklab, var(--brand-graphite) 65%, transparent);
+  }
+
+  .text-black\/70 {
+    color: color-mix(in oklab, var(--brand-graphite) 70%, transparent);
+  }
+
+  .text-black\/75 {
+    color: color-mix(in oklab, var(--brand-graphite) 75%, transparent);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+
+  html,
+  body {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-satoshi);
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-clash-grotesk);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+}
+
+.logo-wipe {
+  --wipe: 100%;
+  -webkit-mask-image: linear-gradient(90deg,
+      #000 0 33%,
+      transparent 50%,
+      transparent 100%);
+  mask-image: linear-gradient(90deg,
+      #000 0 33%,
+      transparent 50%,
+      transparent 100%);
+  -webkit-mask-size: 300% 100%;
+  mask-size: 300% 100%;
+  -webkit-mask-position: var(--wipe) 0;
+  mask-position: var(--wipe) 0;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+.grid-paper {
+  background-image:
+    linear-gradient(to right, rgb(0 0 0 / 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(0 0 0 / 0.03) 1px, transparent 1px);
+  background-size: 9vw 9vw;
+}
+
+.pill-fill {
+  clip-path: inset(0 0 0 0 round 9999px);
+  transition: clip-path 500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (hover: hover) {
+  .group:hover .pill-fill {
+    clip-path: inset(calc(50% - 0.8rem) 0.8rem calc(50% - 0.8rem) calc(100% - 2.4rem) round 9999px);
+  }
+}
+
+@keyframes rule-swap {
+  0% {
+    transform: scaleX(1);
+    transform-origin: right;
+  }
+
+  48% {
+    transform: scaleX(0);
+    transform-origin: right;
+  }
+
+  52% {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  100% {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+}
+
+.rule-swap {
+  transform-origin: left;
+}
+
+@media (hover: hover) {
+  .group:hover .rule-swap {
+    animation: rule-swap 700ms cubic-bezier(0.65, 0, 0.35, 1);
+  }
+}
+
+.group:focus-visible .rule-swap {
+  animation: rule-swap 700ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.pill-line {
+  background-image: linear-gradient(var(--brand-bone), var(--brand-bone)),
+    linear-gradient(currentColor, currentColor),
+    linear-gradient(rgb(0 0 0 / 0.25), rgb(0 0 0 / 0.25));
+  background-origin: padding-box, border-box, border-box;
+  background-clip: padding-box, border-box, border-box;
+  background-repeat: no-repeat;
+  background-size: 100% 100%, 0% 100%, 100% 100%;
+  transition: background-size 600ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+@media (hover: hover) {
+  .pill-line:hover {
+    background-size: 100% 100%, 100% 100%, 100% 100%;
+  }
+}
+
+.pill-line:focus-visible {
+  background-size: 100% 100%, 100% 100%, 100% 100%;
+}
+
+.pill-ink {
+  clip-path: circle(0% at var(--ink-x, 50%) var(--ink-y, 50%));
+  transition: clip-path 620ms cubic-bezier(0.83, 0, 0.17, 1);
+}
+
+.pill-ink-on {
+  clip-path: circle(140% at var(--ink-x, 50%) var(--ink-y, 50%));
+}
+
+::view-transition-new(.page-in) {
+  animation: 1500ms cubic-bezier(0.76, 0, 0.24, 1) both page-in;
+}
+
+::view-transition-old(.page-out) {
+  animation: none;
+}
+
+@keyframes page-in {
+  from {
+    translate: 100% 0;
+  }
+
+  to {
+    translate: 0 0;
+  }
+}
+
+html[data-leaving="sheet"]::view-transition-group(.page-out) {
+  z-index: 2;
+}
+
+html[data-leaving="sheet"]::view-transition-old(.page-out) {
+  animation: 620ms cubic-bezier(0.4, 0, 0.2, 1) both sheet-out;
+}
+
+html[data-leaving="sheet"]::view-transition-new(.page-in) {
+  animation: none;
+}
+
+@keyframes sheet-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+::view-transition {
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}
+
+.fade-out-left {
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 42%);
+  mask-image: linear-gradient(to right, transparent 0%, #000 42%);
+}
+
+@keyframes product-timer {
+  from {
+    stroke-dashoffset: var(--dash);
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.product-timer {
+  animation-name: product-timer;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+html.is-scroll-locked,
+html.is-scroll-locked body {
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

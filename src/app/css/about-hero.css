@@ -1,0 +1,40 @@
+@media (width < 768px) {
+
+  .about-hero {
+    --runway: 2.5;
+  }
+
+  .about-hero .hero-stack {
+
+    @apply inset-0 justify-between px-5 pb-[8svh] pt-[14svh];
+  }
+
+  .about-hero .hero-copy {
+    @apply mt-0;
+  }
+
+  .about-hero .hero-picture {
+    object-position: 0% 50%;
+  }
+
+  .about-hero .hero-scrim {
+    background-image: linear-gradient(to bottom,
+        rgb(0 0 0 / 0.5) 0%,
+        rgb(0 0 0 / 0.2) 34%,
+        rgb(0 0 0 / 0.45) 62%,
+        rgb(0 0 0 / 0.72) 100%);
+    background-color: transparent;
+  }
+}
+
+@media (768px <=width < 1280px) {
+  .about-hero .hero-copy-part {
+    font-size: clamp(16px, 1.6vw, 19px);
+  }
+
+  .about-hero .hero-copy-part+.hero-copy-part {
+    @apply mt-4;
+
+    font-size: clamp(15px, 1.5vw, 18px);
+  }
+}

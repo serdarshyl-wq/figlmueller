@@ -1,0 +1,38 @@
+@media (width < 768px) {
+  .regional-growth {
+    --runway: 3.5;
+  }
+
+  .regional-growth .grid-paper {
+    background-size: 30vw 30vw;
+  }
+
+  .regional-growth .map-field {
+    @apply flex h-full flex-col items-center justify-center;
+  }
+
+  .regional-growth .map-centre,
+  .regional-growth .map-cta-slot {
+    @apply static w-full px-6 text-center;
+
+    translate: none;
+  }
+
+  .regional-growth .map-cta-slot {
+    @apply mt-7;
+  }
+
+  .regional-growth .map-cta {
+    @apply inline-flex w-auto max-w-full flex-col items-center justify-center rounded-full px-5 py-3 leading-[1.35];
+
+    font-size: clamp(9px, 2.6vw, 12px);
+  }
+
+  .regional-growth .map-cta .cta-line {
+    @apply mr-0;
+  }
+
+  .regional-growth .map-note {
+    @apply max-w-[calc(50%-2rem)];
+  }
+}

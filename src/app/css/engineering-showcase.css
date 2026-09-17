@@ -1,0 +1,38 @@
+@media (width < 1280px) {
+  .engineering-showcase .showcase-stack {
+    @apply gap-0 pb-24 pt-0;
+  }
+
+  .engineering-showcase .showcase-frame {
+    @apply relative mx-0 aspect-auto h-[50svh] w-full;
+  }
+
+  .engineering-showcase .showcase-copy {
+    @apply px-6 pt-[6svh];
+  }
+}
+
+@media (768px <=width < 1280px) {
+
+  .engineering-showcase {
+    margin-top: -32svh;
+  }
+
+  .engineering-showcase .showcase-copy {
+    @apply px-10;
+  }
+
+  .engineering-showcase .showcase-heading h2 {
+    font-size: clamp(32px, 5.2vw, 38px);
+    line-height: 1.14;
+  }
+
+  .engineering-showcase .showcase-body {
+    @apply mt-10 space-y-5;
+  }
+
+  .engineering-showcase .showcase-body p {
+    font-size: clamp(18px, 3.6vw, 21px);
+    line-height: 1.55;
+  }
+}

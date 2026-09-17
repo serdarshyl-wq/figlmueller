@@ -1,0 +1,38 @@
+{
+  "hero": {
+    "image": "/services-assets/services-dummy3.jpeg",
+    "alt": "Figlmueller machinery on an infrastructure site",
+    "title": "Applications"
+  },
+  "intro": {
+    "title": [
+      "Machinery for infrastructure",
+      "and civil engineering applications"
+    ],
+    "body": "Built for environments where mobility, accuracy, and controlled production matter. Flowable fill production. Backfill works. Underground infrastructure. Utility projects. Site-based material production."
+  },
+  "blocks": [
+    {
+      "id": "application-areas",
+      "title": "Application Areas",
+      "items": [
+        "Underground infrastructure",
+        "Utility trenches",
+        "Pipeline works",
+        "Roadworks",
+        "Civil engineering backfill",
+        "Urban development projects",
+        "Public infrastructure works",
+        "Construction material production",
+        "Site-based mixing and production"
+      ],
+      "image": "/services-assets/applications-dummy1.jpeg"
+    },
+    {
+      "id": "connection-to-fillwaves",
+      "title": "Connection to FillWaves®",
+      "body": "FIGLMUELLER machinery powers advanced flowable fill materials, including Temporarily Flowable Self-Compacting Backfill Material. FillWaves® — the dedicated material brand — carries the technical performance, benefits, and application detail.",
+      "image": "/services-assets/applications-dummy2.jpeg"
+    }
+  ]
+}

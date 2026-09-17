@@ -1,0 +1,37 @@
+{
+  "hero": {
+    "image": "/services-assets/services-dummy1.jpeg",
+    "alt": "Automation and control on a Figlmueller production platform",
+    "title": "Automation & Control"
+  },
+  "intro": {
+    "title": ["Intelligent operation", "for reliable production"],
+    "body": "Integrated automation and control, built into every machine. One interface. Full production cycle. Less manual intervention, more consistent output."
+  },
+  "blocks": [
+    {
+      "id": "plc-based-control",
+      "title": "PLC-Based Control",
+      "body": "The PLC runs the sequence: weighing, transfer, water addition, mixing, discharge, monitoring. Controlled. Repeatable. Every cycle.",
+      "image": "/services-assets/automation-control-dummy2.jpeg"
+    },
+    {
+      "id": "hmi-touchscreen",
+      "title": "HMI Touchscreen",
+      "body": "Monitor status. Enter parameters. Adjust settings. Select mix designs. One centralized control point.",
+      "image": "/services-assets/automation-control-dummy3.jpeg"
+    },
+    {
+      "id": "mix-design-management",
+      "title": "Mix Design Management",
+      "body": "Multiple mix designs, stored and ready. Fast adaptation to project requirements. Controlled proportions, every time.",
+      "image": "/services-assets/automation-control-dummy4.jpeg"
+    },
+    {
+      "id": "alarm-and-protection",
+      "title": "Alarm & Protection",
+      "body": "Detects abnormal conditions. Alerts the operator. Better safety. Protected equipment. Less downtime.",
+      "image": "/services-assets/automation-control-dummy2.jpeg"
+    }
+  ]
+}

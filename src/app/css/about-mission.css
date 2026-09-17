@@ -1,0 +1,19 @@
+@media (width < 1280px) {
+  .about-mission {
+    --runway: 5.5;
+  }
+
+  .about-mission .mission-pane {
+    height: 100lvh;
+  }
+}
+
+@media (768px <=width < 1280px) {
+  .about-mission {
+    --runway: 8;
+  }
+
+  .about-mission .mission-copy {
+    font-size: clamp(19px, 1.9vw, 24px);
+  }
+}

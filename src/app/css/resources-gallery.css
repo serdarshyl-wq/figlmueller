@@ -1,0 +1,69 @@
+@media (width < 1280px) {
+
+  .resources-gallery {
+    margin-top: -100lvh;
+  }
+
+  .resources-gallery .gallery-cta {
+    --cta-font: 0.68rem;
+
+    @apply py-2.5 pl-5 pr-12;
+  }
+
+  .resources-panel {
+
+    @apply inset-x-0 bottom-0 top-auto h-[80svh] w-full;
+
+    --panel-title: clamp(30px, 8.6vw, 44px);
+
+    translate: 0 100%;
+  }
+
+  .resources-panel.is-open {
+    translate: 0 0;
+  }
+
+  .resources-panel .panel-head {
+    @apply px-5 pt-5;
+  }
+
+  .resources-panel .panel-titles {
+    @apply px-5 pt-6;
+  }
+
+  .resources-panel .panel-body {
+    @apply px-5;
+  }
+
+  .resources-panel .panel-note {
+    font-size: clamp(22px, 6.4vw, 32px);
+  }
+}
+
+@media (768px <=width < 1280px) {
+  .resources-gallery .gallery-cta {
+    --cta-font: clamp(12px, 1.15vw, 14px);
+
+    @apply py-3.5 pl-7 pr-16;
+  }
+
+  .resources-panel {
+    --panel-title: clamp(52px, 5.2vw, 66px);
+  }
+
+  .resources-panel .panel-head {
+    @apply px-10 pt-8;
+  }
+
+  .resources-panel .panel-titles {
+    @apply px-10 pt-10;
+  }
+
+  .resources-panel .panel-body {
+    @apply px-10;
+  }
+
+  .resources-panel .panel-note {
+    font-size: clamp(26px, 2.6vw, 32px);
+  }
+}
