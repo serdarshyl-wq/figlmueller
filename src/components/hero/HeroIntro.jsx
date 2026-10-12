@@ -21,7 +21,7 @@ import ActionButton from "@/components/ui/ActionButton";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const VIDEO_SRC = "/hero%26intro.mp4";
+const VIDEO_SRC = "/hero-original.mp4";
 const HANDOVER_AT = 6;
 const VIDEO_SCALE = 1.1;
 
