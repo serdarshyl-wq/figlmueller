@@ -11,6 +11,7 @@ const IMAGE = {
   src: "/about-img/about-hero-dummy.jpeg",
   width: 2752,
   height: 1536,
+  alt: "Figlmueller engineers in a concrete hall",
 };
 
 const HEADING = ["Industrial", "Engineering"];
@@ -75,7 +76,19 @@ const COPY_IN = 1.4;
 const COPY_STEP = 0.3;
 const TIMELINE_END = 8.5;
 
-export default function AboutHero() {
+export default function AboutHero({ content }) {
+  const heading = content?.headingLines?.length
+    ? content.headingLines
+    : HEADING;
+  const subtitle = content?.subtitle || SUBTITLE;
+  const body = content?.body?.length ? content.body : BODY;
+  const image = {
+    src: content?.image?.url || IMAGE.src,
+    width: content?.image?.width || IMAGE.width,
+    height: content?.image?.height || IMAGE.height,
+    alt: content?.imageAlt || IMAGE.alt,
+  };
+
   const rootRef = useRef(null);
   const prefersReducedMotion = useReducedMotion();
   const animated = !prefersReducedMotion;
@@ -230,10 +243,10 @@ export default function AboutHero() {
       >
         <div className="hero-frame absolute inset-0 overflow-hidden">
           <Image
-            src={IMAGE.src}
-            alt="Figlmueller engineers in a concrete hall"
-            width={IMAGE.width}
-            height={IMAGE.height}
+            src={image.src}
+            alt={image.alt}
+            width={image.width}
+            height={image.height}
             priority
             sizes="100vw"
             unoptimized
@@ -251,7 +264,7 @@ export default function AboutHero() {
             id="about-hero-heading"
             className="hero-title whitespace-nowrap text-center font-display text-[clamp(1.75rem,5vw,6rem)] font-semibold uppercase leading-[0.92] tracking-[-0.03em] will-change-transform"
           >
-            {HEADING.map((line) => (
+            {heading.map((line) => (
               <span key={line} className="block">
                 {line}
               </span>
@@ -260,10 +273,10 @@ export default function AboutHero() {
 
           <div className="hero-copy mt-6 w-full max-w-[86ch] text-center">
             <p className="hero-copy-part font-display text-[clamp(0.72rem,0.95vw,1.05rem)] font-medium uppercase tracking-[0.18em] text-white/70">
-              {SUBTITLE}
+              {subtitle}
             </p>
 
-            {BODY.map((paragraph) => (
+            {body.map((paragraph) => (
               <p
                 key={paragraph}
                 className="hero-copy-part mt-3 text-[clamp(0.75rem,0.85vw,0.98rem)] leading-[1.55] text-white/70"

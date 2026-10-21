@@ -4,8 +4,18 @@
   }
 
   .hero-intro .hero-video,
-  .hero-intro .hero-freeze,
-  .hero-intro .hero-still {
+  .hero-intro .hero-freeze {
     @apply absolute inset-0 h-full w-full object-cover;
+  }
+
+  /* A phone has no room for the signature and the scroll cue on one line, and
+     the signature is the one that has to stay on its own row: the cue moves
+     above it, still held to the right. */
+  .hero-intro .hero-foot {
+    @apply flex-col-reverse items-stretch gap-4;
+  }
+
+  .hero-intro .hero-foot .hero-fade {
+    @apply justify-end;
   }
 }

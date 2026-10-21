@@ -15,6 +15,11 @@ const HEADING_LINES = [
   "for modern infrastructure",
 ];
 
+const PICTURE = {
+  src: "/CUSTOM-MACHINERY.jpg",
+  alt: "Excavator and service trucks working a road site in cold morning steam",
+};
+
 const BODY = [
   "Construction sites demand machinery that's mobile, accurate, reliable, and simple to run.",
   "FIGLMUELLER integrates material storage, precision weighing, conveying, mixing, water supply, compressed air, and electronic control — all on one platform.",
@@ -47,7 +52,14 @@ const COPY_RISE = 96;
 const COPY_SPAN = 0.5;
 const CURTAIN_SCRUB = 0.16;
 
-export default function EngineeringShowcase() {
+export default function EngineeringShowcase({ content }) {
+  const headingLines = content?.headingLines?.length
+    ? content.headingLines
+    : HEADING_LINES;
+  const body = content?.body?.length ? content.body : BODY;
+  const pictureSrc = content?.image?.url || PICTURE.src;
+  const pictureAlt = content?.imageAlt || PICTURE.alt;
+
   const rootRef = useRef(null);
   const prefersReducedMotion = useReducedMotion();
   const isPhone = useIsPhone();
@@ -245,8 +257,8 @@ export default function EngineeringShowcase() {
             }
           >
             <Image
-              src="/CUSTOM-MACHINERY.jpg"
-              alt="Excavator and service trucks working a road site in cold morning steam"
+              src={pictureSrc}
+              alt={pictureAlt}
               fill
               sizes="100vw"
               className="showcase-picture h-full w-full object-cover will-change-transform"
@@ -271,7 +283,7 @@ export default function EngineeringShowcase() {
                 id="showcase-heading"
                 className="font-display text-[clamp(1.15rem,1.85vw,2.1rem)] font-medium uppercase leading-[1.16] tracking-[-0.01em]"
               >
-                {HEADING_LINES.map((line) => (
+                {headingLines.map((line) => (
                   <span key={line} className="block">
                     {line}
                   </span>
@@ -286,7 +298,7 @@ export default function EngineeringShowcase() {
                   : "showcase-body mt-8 space-y-4"
               }
             >
-              {BODY.map((paragraph) => (
+              {body.map((paragraph) => (
                 <p
                   key={paragraph}
                   className="text-[clamp(0.85rem,0.92vw,1.05rem)] leading-[1.6] text-black/75"

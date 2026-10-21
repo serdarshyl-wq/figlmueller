@@ -17,7 +17,16 @@ const COMPANIES = [
   },
 ];
 
-export default function AboutEcosystem() {
+export default function AboutEcosystem({ content }) {
+  const headingEyebrow = content?.eyebrow || HEADING_EYEBROW;
+  const heading = content?.heading || HEADING;
+  /* Three, and the row is built for three: what is written in the studio is
+     read over the three the section ships with rather than replacing them. */
+  const companies = COMPANIES.map((company, index) => ({
+    name: content?.companies?.[index]?.name || company.name,
+    body: content?.companies?.[index]?.body || company.body,
+  }));
+
   return (
     <section
       id="ecosystem"
@@ -29,16 +38,16 @@ export default function AboutEcosystem() {
         className="text-center font-display uppercase leading-[1.1] tracking-[-0.01em]"
       >
         <span className="block text-[clamp(0.8rem,1.15vw,1.35rem)] font-normal tracking-[0.06em]">
-          {HEADING_EYEBROW}
+          {headingEyebrow}
         </span>
 
         <span className="block text-[clamp(1.5rem,3.2vw,4rem)] font-medium">
-          {HEADING}
+          {heading}
         </span>
       </h2>
 
       <ul className="mt-[7svh] grid grid-cols-1 gap-[2.5vw] md:grid-cols-3">
-        {COMPANIES.map((company, index) => (
+        {companies.map((company, index) => (
           <li key={company.name}>
 
             <div

@@ -51,7 +51,15 @@ const TIMELINE_END = 9.2;
 
 const NOTE_SHIFT = 110;
 
-export default function WeBuild() {
+export default function WeBuild({ content }) {
+  const headingWords = content?.headingWords?.length ? content.headingWords : HEADING;
+  const disciplines = content?.disciplines?.length ? content.disciplines : DISCIPLINES;
+  const footnotes = content?.footnotes?.length ? content.footnotes : FOOTNOTES;
+  const cta = {
+    label: content?.cta?.label || CTA.label,
+    href: content?.cta?.href || CTA.href,
+  };
+
   const rootRef = useRef(null);
   const prefersReducedMotion = useReducedMotion();
   const animated = !prefersReducedMotion;
@@ -208,7 +216,7 @@ export default function WeBuild() {
               : "font-display text-[clamp(2.5rem,9vw,7rem)] font-semibold uppercase leading-none tracking-[-0.03em]"
           }
         >
-          {HEADING.map((word, index) => (
+          {headingWords.map((word, index) => (
             <span
               key={word}
               className={`build-half block will-change-transform${index === 0 ? " mr-[0.22em]" : ""
@@ -224,7 +232,7 @@ export default function WeBuild() {
             }`}
         >
           <ul className="flex flex-col items-center text-center">
-            {DISCIPLINES.map((item) => (
+            {disciplines.map((item) => (
               <li
                 key={item}
                 className={`build-line font-display text-[clamp(1.35rem,3.4vw,3.75rem)] font-semibold uppercase leading-[1.12] tracking-[-0.015em] ${animated ? "will-change-transform" : ""
@@ -235,8 +243,8 @@ export default function WeBuild() {
             ))}
           </ul>
 
-          <ActionButton href={CTA.href} className="mt-10">
-            {CTA.label}
+          <ActionButton href={cta.href} className="mt-10">
+            {cta.label}
           </ActionButton>
         </div>
 
@@ -247,7 +255,7 @@ export default function WeBuild() {
               : "build-notes mt-14 w-full max-w-160 text-right"
           }
         >
-          {FOOTNOTES.map((note) => (
+          {footnotes.map((note) => (
             <p key={note} className="overflow-hidden">
               <span
                 className={`build-note block text-[clamp(0.7rem,0.8vw,0.95rem)] leading-normal text-black/60${animated

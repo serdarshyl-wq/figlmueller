@@ -17,6 +17,7 @@ const BACK = {
   src: "/about-img/back-bg.jpeg",
   width: 2752,
   height: 1536,
+  alt: "Figlmueller machinery on a construction site",
 };
 
 
@@ -42,7 +43,6 @@ const PANELS = [
 ];
 
 const CARD_HEIGHT = 0.62;
-const CARD_RATIO = FRONT.width / FRONT.height;
 const CARD_RISE_FROM = 0.5;
 const FRONT_ZOOM_TO = 1.18;
 const DRIFT_TO = 1.15;
@@ -71,7 +71,34 @@ const EXIT_AT = 14.2;
 const COLLAPSE_AT = 15;
 const COLLAPSE_DURATION = 3.2;
 
-export default function AboutMission() {
+export default function AboutMission({ content }) {
+  const eyebrow = content?.eyebrow || WHY_EYEBROW;
+  const title = content?.titleLines?.length ? content.titleLines : WHY_TITLE;
+  const heldWord = content?.heldWord || HELD_WORD;
+  /* The move is built for these two and looks them up by name: what the studio
+     holds is read over them rather than replacing them, so the words can change
+     while the timeline still finds what it turns over. */
+  const panels = PANELS.map((panel, index) => ({
+    ...panel,
+    word: content?.panels?.[index]?.word || panel.word,
+    body: content?.panels?.[index]?.body || panel.body,
+  }));
+
+  const cardPicture = {
+    src: content?.cardImage?.url || FRONT.src,
+    width: content?.cardImage?.width || FRONT.width,
+    height: content?.cardImage?.height || FRONT.height,
+  };
+  const backPicture = {
+    src: content?.backImage?.url || BACK.src,
+    width: content?.backImage?.width || BACK.width,
+    height: content?.backImage?.height || BACK.height,
+    alt: content?.backImageAlt || BACK.alt,
+  };
+
+  /* The card is as wide as the picture standing in it is tall. */
+  const cardRatio = cardPicture.width / cardPicture.height;
+
   const rootRef = useRef(null);
   const prefersReducedMotion = useReducedMotion();
   const animated = !prefersReducedMotion;
@@ -131,7 +158,7 @@ export default function AboutMission() {
           ? pane.getBoundingClientRect().height
           : window.innerHeight;
         const cardHeight = paneHeight * CARD_HEIGHT;
-        const cardWidth = cardHeight * CARD_RATIO;
+        const cardWidth = cardHeight * cardRatio;
         const riseHeight = cardHeight * CARD_RISE_FROM;
         gsap.set(card, {
           width: compact ? paneWidth : cardWidth * CARD_RISE_FROM,
@@ -318,7 +345,7 @@ export default function AboutMission() {
         tl?.kill();
       };
     },
-    { dependencies: [animated] }
+    { dependencies: [animated, cardRatio] }
   );
 
   return (
@@ -338,11 +365,11 @@ export default function AboutMission() {
           className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-6 text-center font-display uppercase"
         >
           <span className="block text-[clamp(0.65rem,0.78vw,0.9rem)] font-semibold tracking-[0.08em]">
-            {WHY_EYEBROW}
+            {eyebrow}
           </span>
 
           <span className="mt-4 block text-[clamp(1.5rem,3.4vw,4rem)] font-semibold leading-[1.06] tracking-[-0.02em]">
-            {WHY_TITLE.map((line) => (
+            {title.map((line) => (
               <span key={line} className="block">
                 {line}
               </span>
@@ -357,11 +384,11 @@ export default function AboutMission() {
         >
           <div className="mission-face-front absolute inset-0 overflow-hidden backface-hidden transform-[translateZ(1px)]">
             <Image
-              src={FRONT.src}
+              src={cardPicture.src}
               alt=""
               aria-hidden="true"
-              width={FRONT.width}
-              height={FRONT.height}
+              width={cardPicture.width}
+              height={cardPicture.height}
               sizes="60vh"
               className="mission-front-picture h-full w-full object-cover will-change-transform"
             />
@@ -373,10 +400,10 @@ export default function AboutMission() {
                 }`}
             >
               <Image
-                src={BACK.src}
-                alt="Figlmueller machinery on a construction site"
-                width={BACK.width}
-                height={BACK.height}
+                src={backPicture.src}
+                alt={backPicture.alt}
+                width={backPicture.width}
+                height={backPicture.height}
                 sizes="100vw"
                 className="mission-plate h-full w-full object-cover will-change-transform"
               />
@@ -398,16 +425,16 @@ export default function AboutMission() {
                 className={`mission-held block will-change-transform ${animated ? "translate-y-full" : ""
                   }`}
               >
-                {HELD_WORD}
+                {heldWord}
               </span>
             </span>
 
             <span className="relative block overflow-hidden">
               <span className="invisible block" aria-hidden="true">
-                {PANELS[0].word}
+                {panels[0].word}
               </span>
 
-              {PANELS.map((panel, index) => (
+              {panels.map((panel, index) => (
                 <span
                   key={panel.id}
                   data-word={panel.id}
@@ -422,7 +449,7 @@ export default function AboutMission() {
           </h2>
 
           <div className="relative mt-6 h-[16svh] w-full max-w-[46ch]">
-            {PANELS.map((panel) => (
+            {panels.map((panel) => (
               <p
                 key={panel.id}
                 data-copy={panel.id}

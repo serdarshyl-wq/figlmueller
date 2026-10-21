@@ -11,6 +11,7 @@ const IMAGE = {
   src: "/about-img/about-philosopy-dummy.jpeg",
   width: 2752,
   height: 1536,
+  alt: "Figlmueller engineers reviewing machinery on site",
 };
 
 const HEADING = { left: "Engineering", right: "Philosophy" };
@@ -31,7 +32,19 @@ const COPY_IN = 1.3;
 const COPY_STEP = 0.16;
 const TIMELINE_END = 3.6;
 
-export default function AboutPhilosophy() {
+export default function AboutPhilosophy({ content }) {
+  const heading = {
+    left: content?.headingLeft || HEADING.left,
+    right: content?.headingRight || HEADING.right,
+  };
+  const body = content?.body?.length ? content.body : BODY;
+  const image = {
+    src: content?.image?.url || IMAGE.src,
+    width: content?.image?.width || IMAGE.width,
+    height: content?.image?.height || IMAGE.height,
+    alt: content?.imageAlt || IMAGE.alt,
+  };
+
   const rootRef = useRef(null);
   const prefersReducedMotion = useReducedMotion();
   const animated = !prefersReducedMotion;
@@ -129,10 +142,10 @@ export default function AboutPhilosophy() {
 
         <div className="philosophy-frame aspect-2752/1536 w-[44vw] shrink-0 overflow-hidden">
           <Image
-            src={IMAGE.src}
-            alt="Figlmueller engineers reviewing machinery on site"
-            width={IMAGE.width}
-            height={IMAGE.height}
+            src={image.src}
+            alt={image.alt}
+            width={image.width}
+            height={image.height}
             sizes="44vw"
             className="h-full w-full object-cover"
           />
@@ -146,20 +159,20 @@ export default function AboutPhilosophy() {
             data-word="left"
             className="block will-change-transform"
           >
-            {HEADING.left}
+            {heading.left}
           </span>
           <span
             data-word="right"
             className="block will-change-transform"
           >
-            {HEADING.right}
+            {heading.right}
           </span>
         </h2>
       </div>
 
       <div className="philosophy-copy mt-[10svh] px-[4vw]">
         <div className="philosophy-body max-w-[62ch] text-[clamp(0.78rem,0.92vw,1.05rem)] leading-[1.6] text-white/70">
-          {BODY.map((line) => (
+          {body.map((line) => (
             <span key={line} className="block overflow-hidden">
               <span
                 className={`philosophy-line block will-change-transform ${animated ? "translate-y-full" : ""

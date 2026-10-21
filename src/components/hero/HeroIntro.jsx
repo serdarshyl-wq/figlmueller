@@ -21,24 +21,75 @@ import ActionButton from "@/components/ui/ActionButton";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const VIDEO_SRC = "/hero-original.mp4";
+/*
+ * What the site ships with, and what a page with nothing in the content store
+ * still opens on. Everything here can be replaced from /admin; these are the
+ * values the page falls back to, not the values it prefers.
+ */
+const FALLBACK = {
+  video: { wide: { url: "/hero-original.mp4" } },
+  headingLines: ["Built to move", "heavy industry"],
+  scrollLabel: "Scroll",
+};
+
 const HANDOVER_AT = 6;
 const VIDEO_SCALE = 1.1;
 
-const HANDOVER_POSTER = "/hero-handover.jpg";
+/* How much of the film a reader arriving from another page is given: the last
+   seconds of it, played out rather than wound forward behind a still. */
+const ARRIVAL_TAIL = 3;
+
+/*
+ * When the intro lets go of the screen: six seconds in, and sooner on a film
+ * with less than that to give. Never later than the tail a returning reader
+ * sees, so whatever the client uploads, the page arrives before the film runs
+ * out - nothing for anyone to set, and nothing to get wrong.
+ */
+const handoverAt = (video) => {
+  const { duration } = video;
+  if (!Number.isFinite(duration)) return HANDOVER_AT;
+
+  return Math.min(HANDOVER_AT, Math.max(0, duration - ARRIVAL_TAIL));
+};
+
+/*
+ * Which cut of the film the screen gets.
+ *
+ * Not a width but a shape: a screen taller than it is wide is a screen a 16:9
+ * film has to be cropped to the middle of, whoever is holding it - a phone
+ * upright, a tablet upright. Turned on its side, either of them is a wide
+ * screen again and gets the wide cut. The browser reads this off the `media`
+ * on the source, so nothing here has to be decided in JavaScript.
+ *
+ * It is read when the film loads and not again, so a device turned mid-intro
+ * keeps the cut it started with. That is the right trade: re-picking would
+ * mean reloading the film and starting the intro over.
+ */
+const TALL_MEDIA = "(max-aspect-ratio: 1/1)";
 
 const SKIP_RATE = 16;
 
 const SKIP_CROSSFADE = 0.7;
 
-export default function HeroIntro() {
+export default function HeroIntro({ content }) {
   const rootRef = useRef(null);
   const videoRef = useRef(null);
   const pushRef = useRef(null);
   const introLogoRef = useRef(null);
   const skipWatchRef = useRef(0);
   const freezeRef = useRef(null);
-  const stillRef = useRef(null);
+
+  /*
+   * The wide cut always exists - it is what every screen falls back to. The
+   * tall one is optional: without it the film is the wide cut everywhere, which
+   * is how the site read before there were two.
+   */
+  const wide = content?.video?.wide?.url ? content.video.wide : FALLBACK.video.wide;
+  const tall = content?.video?.tall?.url ? content.video.tall : null;
+  const headingLines = content?.headingLines?.length
+    ? content.headingLines
+    : FALLBACK.headingLines;
+  const scrollLabel = content?.scrollLabel || FALLBACK.scrollLabel;
 
   const logoLanded = useLogoLanded();
   const [navigated] = useState(
@@ -77,39 +128,68 @@ export default function HeroIntro() {
     }
 
     if (navigated) {
-      const watch = () => {
-        const current = videoRef.current;
-        if (!current) return;
+      /*
+       * A reader who has already been here does not sit through the intro
+       * again. The film is placed three seconds from its own end and plays
+       * that tail out - the page arrives on moving picture rather than on a
+       * held frame, and leaves the screen on the frame it always ended on.
+       *
+       * The tail is measured off the cut the browser actually loaded, since
+       * two cuts of the same film are rarely the same length, and it is not
+       * started until the page has finished sliding in: none of those three
+       * seconds is spent off the side of the screen.
+       */
+      let disposed = false;
+      let placed = false;
+      let settled = false;
 
-        if (current.currentTime >= HANDOVER_AT) {
-          current.playbackRate = 1;
-          if (stillRef.current) {
-            gsap.to(stillRef.current, {
-              autoAlpha: 0,
-              duration: SKIP_CROSSFADE,
-              ease: "power2.inOut",
-            });
-          }
+      const roll = () => {
+        if (disposed || !placed || !settled) return;
+        video.play().catch(() => { });
+      };
+
+      const place = () => {
+        const { duration } = video;
+        if (placed || !Number.isFinite(duration)) return;
+
+        video.currentTime = Math.max(0, duration - ARRIVAL_TAIL);
+        placed = true;
+        roll();
+      };
+
+      const settle = () => {
+        settled = true;
+        roll();
+      };
+
+      place();
+      video.addEventListener("loadedmetadata", place);
+
+      /* The arrival hold is the site's own measure of a page having landed;
+         where the browser is still sliding one in, it has the last word. The
+         page and the footer slide as two animations, so it is the later of
+         them that says when the screen has come to rest. */
+      const held = window.setTimeout(() => {
+        const sliding = document
+          .getAnimations()
+          .filter((animation) => animation.animationName === "page-in")
+          .map((animation) => animation.finished);
+
+        if (!sliding.length) {
+          settle();
           return;
         }
 
-        skipWatchRef.current = requestAnimationFrame(watch);
-      };
-
-      const wind = () => {
-        video.playbackRate = SKIP_RATE;
-        video.play().catch(() => { });
-        skipWatchRef.current = requestAnimationFrame(watch);
-      };
-
-      const held = window.setTimeout(wind, ARRIVAL_MS);
+        Promise.allSettled(sliding).then(settle);
+      }, ARRIVAL_MS);
 
       markIntroHandedOver();
       markLogoLanded();
 
       return () => {
+        disposed = true;
         window.clearTimeout(held);
-        cancelAnimationFrame(skipWatchRef.current);
+        video.removeEventListener("loadedmetadata", place);
       };
     }
 
@@ -119,7 +199,7 @@ export default function HeroIntro() {
   const handleTimeUpdate = useCallback(() => {
     const video = videoRef.current;
     if (!video || handedOver) return;
-    if (video.currentTime < HANDOVER_AT) return;
+    if (video.currentTime < handoverAt(video)) return;
 
     video.playbackRate = 1;
     handOver();
@@ -130,7 +210,7 @@ export default function HeroIntro() {
     const freeze = freezeRef.current;
     setSkipped(true);
 
-    if (!video || video.currentTime >= HANDOVER_AT) {
+    if (!video || video.currentTime >= handoverAt(video)) {
       handOver();
       return;
     }
@@ -162,7 +242,7 @@ export default function HeroIntro() {
       const current = videoRef.current;
       if (!current) return;
 
-      if (current.currentTime >= HANDOVER_AT) {
+      if (current.currentTime >= handoverAt(current)) {
         current.playbackRate = 1;
         if (frozen) {
           gsap.to(freeze, {
@@ -231,9 +311,13 @@ export default function HeroIntro() {
       }
 
       tl.to(".hero-scrim", { opacity: 1, duration: 1.6 }, 0.1)
+        /* The line starts the page a line below its own mask, held there by a
+           class. GSAP reads that class as a translate of its own and keeps it
+           underneath whatever it animates, so the start is stated here in full
+           - the percentage the line travels, and no pixels under it. */
         .fromTo(
           ".hero-reveal",
-          { yPercent: 100 },
+          { y: 0, yPercent: 100 },
           { yPercent: 0, duration: 1.5, stagger: 0.09 },
           0.35
         )
@@ -275,10 +359,12 @@ export default function HeroIntro() {
       data-nav-dark=""
       className="hero-intro sticky top-0 z-0 h-svh w-full overflow-hidden bg-black text-white"
     >
+      {/* The tall cut is offered first and taken only by a screen taller than
+          it is wide; the wide one carries no condition, so it is what every
+          other screen - and any browser that ignores the condition - loads. */}
       <video
         ref={videoRef}
         className="hero-video absolute inset-0 h-full w-full scale-110 object-cover will-change-transform"
-        src={VIDEO_SRC}
         autoPlay={!navigated}
         muted
         playsInline
@@ -288,25 +374,16 @@ export default function HeroIntro() {
         onTimeUpdate={handleTimeUpdate}
         onEnded={release}
         onError={release}
-      />
+      >
+        {tall ? <source src={tall.url} media={TALL_MEDIA} /> : null}
+        <source src={wide.url} />
+      </video>
 
       <canvas
         ref={freezeRef}
         aria-hidden="true"
         className="hero-freeze pointer-events-none absolute inset-0 h-full w-full scale-110 object-cover opacity-0"
       />
-
-      {navigated && (
-        /* eslint-disable-next-line @next/next/no-img-element */
-        <img
-          ref={stillRef}
-          src={HANDOVER_POSTER}
-          alt=""
-          aria-hidden="true"
-          fetchPriority="high"
-          className="hero-still pointer-events-none absolute inset-0 h-full w-full scale-110 object-cover"
-        />
-      )}
 
       <div
         className="hero-scrim pointer-events-none absolute inset-0 bg-linear-to-t from-black/80 via-black/25 to-black/40 opacity-0"
@@ -332,26 +409,27 @@ export default function HeroIntro() {
         </div>
       )}
 
-      <div className="hero-copy relative z-10 flex h-full flex-col justify-end px-6 pb-16 md:px-12 md:pb-20">
-        <h1 className="max-w-5xl text-balance font-light leading-[0.95] tracking-tight text-white">
-          <span className="block overflow-hidden">
-            <span className="hero-reveal block translate-y-full text-[13vw] md:text-[8vw]">
-              Built to move
-            </span>
-          </span>
-          <span className="block overflow-hidden">
-            <span className="hero-reveal block translate-y-full text-[13vw] md:text-[8vw]">
-              heavy industry
-            </span>
-          </span>
-        </h1>
+      <div className="hero-copy relative z-10 flex h-full flex-col justify-end px-6 pb-6 md:px-12 md:pb-8">
+        {/* A signature rather than a headline: the two halves of the line stand
+            side by side in the bottom corner, and the scroll cue keeps the far
+            one, so the film is what the screen is actually for. Each half still
+            rises out of its own mask when the intro hands over. */}
+        <div className="hero-foot flex items-end justify-between gap-8">
+          <h1 className="hero-signature flex flex-wrap items-baseline gap-x-10 gap-y-1 font-display text-[clamp(0.68rem,0.86vw,0.95rem)] font-medium uppercase leading-none tracking-[0.16em] text-white md:gap-x-16">
+            {headingLines.map((headingLine) => (
+              <span key={headingLine} className="block overflow-hidden">
+                <span className="hero-reveal block translate-y-full">
+                  {headingLine}
+                </span>
+              </span>
+            ))}
+          </h1>
 
-        <div className="mt-8 flex items-end justify-end gap-8">
           <span
-            className="hero-fade invisible flex translate-y-4 items-center gap-2 text-[0.7rem] uppercase tracking-[0.3em] text-white/60 opacity-0"
+            className="hero-fade invisible flex shrink-0 translate-y-4 items-center gap-2 text-[0.7rem] uppercase tracking-[0.3em] text-white/60 opacity-0"
             aria-hidden="true"
           >
-            Scroll
+            {scrollLabel}
             <ChevronDown className="size-4 animate-bounce" strokeWidth={1.5} />
           </span>
         </div>

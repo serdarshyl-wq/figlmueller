@@ -23,12 +23,26 @@ const ACTIONS = [
   { label: "Request Technical Meeting", href: "/connect-us" },
 ];
 
+const MACHINE = {
+  src: "/figlmueller-contact-cut.png",
+  alt: "Figlmueller mobile mixing machinery on site",
+  width: 1046,
+  height: 1174,
+};
+
 const IMAGE_START_LEFT = 0.53;
 
 const IMAGE_TRAVEL_FALLBACK = 24;
 const SCRUB = 0.1;
 
-export default function ContactIntro() {
+export default function ContactIntro({ content }) {
+  const displayLines = content?.displayLines?.length ? content.displayLines : DISPLAY_LINES;
+  const heading = content?.heading || HEADING;
+  const lead = content?.lead || LEAD;
+  const actions = content?.actions?.length ? content.actions : ACTIONS;
+  const machine = content?.image?.url || MACHINE.src;
+  const machineAlt = content?.imageAlt || MACHINE.alt;
+
   const partOneRef = useRef(null);
   const prefersReducedMotion = useReducedMotion();
   const animated = !prefersReducedMotion;
@@ -156,7 +170,7 @@ export default function ContactIntro() {
             : "gap-[38vh]"
             }`}
         >
-          {DISPLAY_LINES.map((line, index) => (
+          {displayLines.map((line, index) => (
             <span
               key={line}
               className={`contact-line whitespace-nowrap ${index === 0 ? "self-start" : "self-end"
@@ -169,10 +183,10 @@ export default function ContactIntro() {
 
         <div className="contact-picture pointer-events-none absolute inset-y-0 right-[8vw] z-10 my-auto aspect-1046/1174 h-[68svh] [--image-travel:24] will-change-transform">
           <Image
-            src="/figlmueller-contact-cut.png"
-            alt="Figlmueller mobile mixing machinery on site"
-            width={1046}
-            height={1174}
+            src={machine}
+            alt={machineAlt}
+            width={content?.image?.width || MACHINE.width}
+            height={content?.image?.height || MACHINE.height}
             sizes="40vw"
             className="h-full w-full object-contain"
           />
@@ -188,15 +202,15 @@ export default function ContactIntro() {
             id="contact-heading"
             className="contact-title font-display text-[clamp(1rem,1.5vw,1.9rem)] font-medium uppercase leading-[1.15] tracking-[-0.01em]"
           >
-            {HEADING}
+            {heading}
           </h2>
 
           <p className="contact-lead mt-5 text-[clamp(0.95rem,1.25vw,1.5rem)] font-medium uppercase leading-[1.35] tracking-[0.01em] text-black/70">
-            {LEAD}
+            {lead}
           </p>
 
           <div className="contact-actions mt-8 flex flex-col items-start gap-3">
-            {ACTIONS.map((action) => (
+            {actions.map((action) => (
               <ActionButton key={action.label} href={action.href}>
                 {action.label}
               </ActionButton>

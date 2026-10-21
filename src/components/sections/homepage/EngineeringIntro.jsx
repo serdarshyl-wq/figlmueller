@@ -7,6 +7,13 @@ import MaskedWords from "@/components/ui/MaskedWords";
 import useReducedMotion from "@/hooks/useReducedMotion";
 import driveOnScroll from "@/lib/scrub";
 
+/*
+ * The four parts, with their words as the site ships them.
+ *
+ * Only the words are editable - the size each part is set at and the measure it
+ * is held to are the composition, and are read from here whatever the content
+ * store says. A part that comes back empty keeps the words below it.
+ */
 const PARTS = [
   {
     id: "title",
@@ -60,7 +67,27 @@ const TIMELINE_END =
 const START_VH = 0.5;
 const SCRUB = 0.055;
 
-export default function EngineeringIntro() {
+/*
+ * Where each part's words come from. The first and the last are read down the
+ * screen a line at a time and are kept as lists; the two in the middle are a
+ * sentence each and arrive as one string.
+ */
+const linesFor = (part, content) => {
+  if (part.id === "title") return content?.titleLines?.length ? content.titleLines : part.lines;
+  if (part.id === "closer")
+    return content?.closerLines?.length ? content.closerLines : part.lines;
+
+  const sentence = part.id === "what" ? content?.what : content?.experience;
+  return sentence ? [sentence] : part.lines;
+};
+
+export default function EngineeringIntro({ content }) {
+  /* The words the studio holds, falling back a part at a time. */
+  const parts = PARTS.map((part) => ({
+    ...part,
+    lines: linesFor(part, content),
+  }));
+
   const rootRef = useRef(null);
   const prefersReducedMotion = useReducedMotion();
   const animated = !prefersReducedMotion;
@@ -72,7 +99,7 @@ export default function EngineeringIntro() {
       const root = rootRef.current;
       if (!root) return;
 
-      const words = PARTS.map((part) =>
+      const words = parts.map((part) =>
         root.querySelectorAll(`.part-${part.id} .reveal-word`)
       );
 
@@ -157,7 +184,7 @@ export default function EngineeringIntro() {
               className={`text-center font-display font-medium uppercase leading-[0.94] tracking-[-0.02em] ${animated ? "grid" : "space-y-[0.3em]"
                 }`}
             >
-              {PARTS.map((part) => (
+              {parts.map((part) => (
                 <span
                   key={part.id}
                   className={`part-${part.id} ${partClassName} ${part.measure} ${part.size}`}

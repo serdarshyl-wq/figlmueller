@@ -25,7 +25,14 @@ const PINNED_PX = RUNWAY_PX - PLAYOUT_PX;
 
 const SCRUB = 0.14;
 
-export default function CitrineIntro() {
+export default function CitrineIntro({ content }) {
+  const leadIn = content?.leadIn || LEAD_IN;
+  const heading = content?.heading || HEADING;
+  const cta = {
+    label: content?.cta?.label || CTA.label,
+    href: content?.cta?.href || CTA.href,
+  };
+
   const rootRef = useRef(null);
   const canvasRef = useRef(null);
   const prefersReducedMotion = useReducedMotion();
@@ -138,15 +145,15 @@ export default function CitrineIntro() {
         <div className="relative flex h-full flex-col items-center justify-center px-6 text-center md:px-12">
           <h2 id="citrine-heading" className="font-display uppercase">
             <span className="citrine-lead block text-[clamp(0.95rem,1.5vw,1.5rem)] font-medium leading-[1.3] tracking-[0.06em]">
-              {LEAD_IN}
+              {leadIn}
             </span>
             <span className="citrine-title mt-3 block text-[clamp(1.75rem,4.2vw,4.5rem)] font-medium leading-[1.05] tracking-[0.03em]">
-              {HEADING}
+              {heading}
             </span>
           </h2>
 
-          <ActionButton href={CTA.href} className="mt-10">
-            {CTA.label}
+          <ActionButton href={cta.href} className="mt-10">
+            {cta.label}
           </ActionButton>
         </div>
       </div>

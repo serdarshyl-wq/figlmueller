@@ -51,7 +51,27 @@ const MAP_STEP = 0.4;
 const MAP_FADE = 0.6;
 const TIMELINE_END = 14;
 
-export default function RegionalGrowth() {
+export default function RegionalGrowth({ content }) {
+  const headingLines = content?.headingLines?.length ? content.headingLines : HEADING_LINES;
+  const mapCentre = content?.mapCentre || MAP_CENTRE;
+  /* Placed as whole percentages in the studio and written back as the CSS
+     lengths the field is laid out with. */
+  const markers = content?.markers?.length
+    ? content.markers.map((marker) => ({
+        label: marker.label,
+        top: `${marker.top ?? 50}%`,
+        left: `${marker.left ?? 50}%`,
+      }))
+    : MAP_MARKERS;
+  const mapCta = {
+    lines: content?.ctaLines?.length ? content.ctaLines : MAP_CTA.lines,
+    href: content?.ctaHref || MAP_CTA.href,
+  };
+  const mapNotes = {
+    left: content?.noteLeft || MAP_NOTES.left,
+    right: content?.noteRight || MAP_NOTES.right,
+  };
+
   const rootRef = useRef(null);
   const prefersReducedMotion = useReducedMotion();
   const animated = !prefersReducedMotion;
@@ -196,7 +216,7 @@ export default function RegionalGrowth() {
               : "text-[clamp(1.75rem,5vw,4rem)]"
               }`}
           >
-            {HEADING_LINES.map((line) => (
+            {headingLines.map((line) => (
               <span
                 key={line}
                 className="train-line block will-change-transform"
@@ -220,11 +240,11 @@ export default function RegionalGrowth() {
               : "text-[clamp(1.5rem,6vw,4.5rem)]"
               }`}
           >
-            {MAP_CENTRE}
+            {mapCentre}
           </h3>
 
           <ul className={animated ? undefined : "mt-8 space-y-2"}>
-            {MAP_MARKERS.map((marker) => (
+            {markers.map((marker) => (
               <li
                 key={marker.label}
                 className={`map-reveal flex items-start gap-3 font-display font-light uppercase tracking-[0.08em] ${animated
@@ -252,7 +272,7 @@ export default function RegionalGrowth() {
               : "mt-12 max-w-90"
               }`}
           >
-            {MAP_NOTES.left}
+            {mapNotes.left}
           </p>
 
           <p
@@ -261,7 +281,7 @@ export default function RegionalGrowth() {
               : "mt-6 max-w-90"
               }`}
           >
-            {MAP_NOTES.right}
+            {mapNotes.right}
           </p>
 
           <div
@@ -270,8 +290,8 @@ export default function RegionalGrowth() {
               : "mt-10"
               }`}
           >
-            <ActionButton href={MAP_CTA.href} className="map-cta">
-              {MAP_CTA.lines.map((line, index) => (
+            <ActionButton href={mapCta.href} className="map-cta">
+              {mapCta.lines.map((line, index) => (
                 <span
                   key={line}
                   className={`cta-line${index === 0 ? " mr-[0.3em]" : ""}`}

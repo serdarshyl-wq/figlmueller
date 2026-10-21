@@ -6,6 +6,7 @@ import AboutShowcase from "@/components/sections/about/AboutShowcase";
 import AboutFounder from "@/components/sections/about/AboutFounder";
 import PageTransition from "@/components/layout/PageTransition";
 import AfterArrival from "@/components/layout/AfterArrival";
+import { getAboutPage } from "@/sanity/lib/about";
 
 export const metadata = {
   title: "About — Figlmueller Ind | L.L.C",
@@ -13,18 +14,20 @@ export const metadata = {
     "Figlmueller Ind | L.L.C — industrial engineering for modern construction machinery, Dubai, UAE.",
 };
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const content = await getAboutPage();
+
   return (
     <PageTransition>
       <main className="flex-1">
-        <AboutHero />
+        <AboutHero content={content?.opening} />
 
         <AfterArrival>
-          <AboutMission />
-          <AboutPhilosophy />
-          <AboutEcosystem />
-          <AboutShowcase />
-          <AboutFounder />
+          <AboutMission content={content?.mission} />
+          <AboutPhilosophy content={content?.philosophy} />
+          <AboutEcosystem content={content?.ecosystem} />
+          <AboutShowcase content={content?.showcase} />
+          <AboutFounder content={content?.founder} />
         </AfterArrival>
       </main>
     </PageTransition>

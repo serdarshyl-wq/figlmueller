@@ -112,7 +112,16 @@ function ShowcaseGroup({ company, opening = OPENING_TILES }) {
   );
 }
 
-export default function AboutShowcase() {
+export default function AboutShowcase({ content }) {
+  /* Three, and the move is timed to three: what the studio holds is read over
+     the three the section ships with, so the words can change without the
+     timeline being rebuilt around a different count. */
+  const companies = COMPANIES.map((company, index) => ({
+    ...company,
+    word: content?.companies?.[index]?.word || company.word,
+    label: content?.companies?.[index]?.label || company.label,
+  }));
+
   const rootRef = useRef(null);
   const seekRef = useRef(null);
   const prefersReducedMotion = useReducedMotion();
@@ -343,7 +352,7 @@ export default function AboutShowcase() {
     return (
       <section className="about-showcase relative z-10 bg-black text-white">
         <ul className="showcase-groups">
-          {COMPANIES.map((company) => (
+          {companies.map((company) => (
             <ShowcaseGroup
               key={company.id}
               company={company}
@@ -355,7 +364,7 @@ export default function AboutShowcase() {
     );
   }
 
-  const names = animated ? COMPANIES : COMPANIES.slice(0, 1);
+  const names = animated ? companies : companies.slice(0, 1);
 
   return (
     <section
@@ -410,7 +419,7 @@ export default function AboutShowcase() {
           className={`showcase-index pointer-events-none absolute inset-x-0 bottom-[6svh] flex flex-col items-center gap-1 font-display text-[0.72rem] font-semibold uppercase tracking-[0.06em] ${animated ? "invisible" : ""
             }`}
         >
-          {COMPANIES.map((company, tabIndex) => (
+          {companies.map((company, tabIndex) => (
             <li
               key={company.id}
               className={`showcase-tab ${!animated && tabIndex > 0 ? "text-white/25" : "text-white"

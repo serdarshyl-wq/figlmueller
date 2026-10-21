@@ -96,21 +96,53 @@ const blockSpan = (block) =>
   (sentenceCount(block) - 1) * LINE_STEP +
   LINE_IN;
 
-const BLOCK_AT = BLOCKS.reduce(
-  (starts, block, index) =>
-    index === 0
-      ? [FIRST_BLOCK_AT]
-      : [
-        ...starts,
-        starts[index - 1] + blockSpan(BLOCKS[index - 1]) - BLOCK_OVERLAP,
-      ],
-  []
-);
+/*
+ * Where each chapter starts: a chapter takes as long as its sentences take to
+ * be read out, and the next one is started a little before it ends. The timing
+ * is measured from the writing rather than written down, so a chapter that
+ * gains a sentence simply takes longer.
+ */
+const startsFor = (blocks) =>
+  blocks.reduce(
+    (starts, block, index) =>
+      index === 0
+        ? [FIRST_BLOCK_AT]
+        : [
+          ...starts,
+          starts[index - 1] + blockSpan(blocks[index - 1]) - BLOCK_OVERLAP,
+        ],
+    []
+  );
 
-const TIMELINE_END =
-  BLOCK_AT[BLOCKS.length - 1] + blockSpan(BLOCKS[BLOCKS.length - 1]);
+export default function AboutFounder({ content }) {
+  const heading = content?.headingLines?.length
+    ? content.headingLines
+    : HEADING;
+  const leftLabel = content?.leftLabel || LEFT_LABEL;
+  const rightLabel = content?.rightLabel || RIGHT_LABEL;
 
-export default function AboutFounder() {
+  /* The chapters as they are written, each one read over the chapter the page
+     ships with: the shipped list carries the names the timeline and the links
+     into this section use, and the writing, the heading and the picture come
+     from the studio. */
+  const blocks = (content?.blocks?.length ? content.blocks : BLOCKS).map(
+    (block, index) => ({
+      id: BLOCKS[index]?.id ?? `block-${index + 1}`,
+      title: block.title ?? BLOCKS[index]?.title,
+      image: block.image?.url || block.image || BLOCKS[index]?.image,
+      paragraphs:
+        block.paragraphs
+          ?.map((paragraph) => paragraph.sentences ?? paragraph)
+          .filter((sentences) => sentences?.length) ??
+        BLOCKS[index]?.paragraphs ??
+        [],
+    })
+  );
+
+  const blockAt = startsFor(blocks);
+  const timelineEnd =
+    blockAt[blocks.length - 1] + blockSpan(blocks[blocks.length - 1]);
+
   const rootRef = useRef(null);
   const prefersReducedMotion = useReducedMotion();
   const animated = !prefersReducedMotion;
@@ -123,7 +155,7 @@ export default function AboutFounder() {
       if (!root) return;
 
       const pictures = root.querySelectorAll(".founder-picture");
-      if (pictures.length !== BLOCKS.length) return;
+      if (pictures.length !== blocks.length) return;
 
       let tl = null;
       let disposed = false;
@@ -136,8 +168,8 @@ export default function AboutFounder() {
 
         tl = gsap.timeline({ paused: true });
 
-        BLOCKS.forEach((block, index) => {
-          const at = BLOCK_AT[index];
+        blocks.forEach((block, index) => {
+          const at = blockAt[index];
           const title = root.querySelector(`[data-title="${block.id}"]`);
           const sentences = root.querySelectorAll(
             `[data-lines="${block.id}"] .founder-sentence`
@@ -177,7 +209,7 @@ export default function AboutFounder() {
           );
         });
 
-        tl.to({}, { duration: 0 }, TIMELINE_END);
+        tl.to({}, { duration: 0 }, timelineEnd);
       };
 
       build();
@@ -232,14 +264,14 @@ export default function AboutFounder() {
       >
         <div className="flex items-start justify-between gap-6 font-display uppercase">
           <span className="text-[clamp(0.9rem,1.6vw,2rem)] font-medium tracking-[-0.01em]">
-            {LEFT_LABEL}
+            {leftLabel}
           </span>
 
           <h2
             id="founder-heading"
             className="text-center text-[clamp(1.1rem,2.4vw,3rem)] font-medium leading-[1.08] tracking-[-0.02em]"
           >
-            {HEADING.map((line) => (
+            {heading.map((line) => (
               <span key={line} className="block">
                 {line}
               </span>
@@ -247,13 +279,13 @@ export default function AboutFounder() {
           </h2>
 
           <span className="text-[clamp(0.9rem,1.6vw,2rem)] font-medium tracking-[-0.01em]">
-            {RIGHT_LABEL}
+            {rightLabel}
           </span>
         </div>
 
         <div className="mt-[6svh] grid flex-1 grid-cols-1 items-stretch gap-[6vw] md:grid-cols-[54%_1fr]">
           <div className="relative h-full w-full overflow-hidden">
-            {BLOCKS.map((block, index) => (
+            {blocks.map((block, index) => (
               <Image
                 key={block.id}
                 src={block.image}
@@ -269,7 +301,7 @@ export default function AboutFounder() {
           </div>
 
           <div className="flex flex-col gap-[3.5svh]">
-            {BLOCKS.map((block) => (
+            {blocks.map((block) => (
               <div key={block.id}>
                 {block.title ? (
                   <h3
