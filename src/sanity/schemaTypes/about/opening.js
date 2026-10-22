@@ -6,8 +6,8 @@ export const opening = section("aboutOpening", "Opening", [
     title: "Picture",
     type: "image",
     options: { hotspot: true },
-    description:
-      "Held across the whole screen behind the title, darkened. Left empty, the page keeps the picture it ships with.",
+    description: "Held across the whole screen behind the title, darkened.",
+    validation: (rule) => rule.required(),
   },
   line(
     "imageAlt",

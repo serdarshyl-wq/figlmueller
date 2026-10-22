@@ -68,7 +68,8 @@ export const founder = section("aboutFounder", "Founder", [
             type: "image",
             options: { hotspot: true },
             description:
-              "Held beside the writing and faded into the one before it.",
+              "This chapter's own picture, held beside the writing and faded into the one before it. Every chapter has one.",
+            validation: (rule) => rule.required(),
           },
           paragraphs,
         ],

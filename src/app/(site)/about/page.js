@@ -25,8 +25,10 @@ export default async function AboutPage() {
         <AfterArrival>
           <AboutMission content={content?.mission} />
           <AboutPhilosophy content={content?.philosophy} />
+          {/* The row of companies and the field that passes through them are
+              the same list, read twice. */}
           <AboutEcosystem content={content?.ecosystem} />
-          <AboutShowcase content={content?.showcase} />
+          <AboutShowcase content={content?.ecosystem} />
           <AboutFounder content={content?.founder} />
         </AfterArrival>
       </main>

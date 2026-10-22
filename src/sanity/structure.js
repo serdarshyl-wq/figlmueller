@@ -1,5 +1,6 @@
 import { aboutSections } from "@/sanity/schemaTypes/about";
 import { homeSections } from "@/sanity/schemaTypes/home";
+import { servicePages, servicesSections } from "@/sanity/schemaTypes/services";
 
 /*
  * The studio's own left-hand list.
@@ -8,9 +9,10 @@ import { homeSections } from "@/sanity/schemaTypes/home";
  * site's own shape - the pages in the order they are linked, each a folder of
  * its sections - rather than an alphabetical list of document types.
  *
- * Every section is a document of its own and always the same one: opened by
- * name rather than through a list with a single entry and a new button that
- * would make a second one.
+ * Everything in it is opened by name: a section is always the same document,
+ * and a service page is the document whose route it is. Nothing is reached
+ * through a list with a single entry and a new button that would make a second
+ * one.
  */
 const sectionItem = (S, { name, title }) =>
   S.listItem()
@@ -18,22 +20,41 @@ const sectionItem = (S, { name, title }) =>
     .id(name)
     .child(S.document().schemaType(name).documentId(name).title(title));
 
-const pageFolder = (S, id, title, sections) =>
+/* A service page is a `servicePage` document, told apart by its route: the id
+   is the route, so the studio opens the page the site reads at that path. */
+const servicePageItem = (S, { slug, title }) =>
+  S.listItem()
+    .title(title)
+    .id(slug)
+    .child(
+      S.document().schemaType("servicePage").documentId(slug).title(title)
+    );
+
+const folder = (S, id, title, items) =>
   S.listItem()
     .title(title)
     .id(id)
-    .child(
-      S.list()
-        .title(title)
-        .items(sections.map((section) => sectionItem(S, section)))
-    );
+    .child(S.list().title(title).items(items));
 
 export const structure = (S) =>
   S.list()
     .title("Figlmueller")
     .items([
-      pageFolder(S, "homepage", "Homepage", homeSections),
-      pageFolder(S, "aboutpage", "About", aboutSections),
-      S.divider(),
-      S.documentTypeListItem("servicePage").title("Service pages"),
+      folder(
+        S,
+        "homepage",
+        "Homepage",
+        homeSections.map((section) => sectionItem(S, section))
+      ),
+      folder(
+        S,
+        "aboutpage",
+        "About",
+        aboutSections.map((section) => sectionItem(S, section))
+      ),
+      folder(S, "servicespages", "Services", [
+        ...servicesSections.map((section) => sectionItem(S, section)),
+        S.divider(),
+        ...servicePages.map((page) => servicePageItem(S, page)),
+      ]),
     ]);

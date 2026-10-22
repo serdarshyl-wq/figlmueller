@@ -3,16 +3,19 @@ import ServicesOverview from "@/components/sections/services/ServicesOverview";
 import ServicesFeatures from "@/components/sections/services/ServicesFeatures";
 import ServicesOther from "@/components/sections/services/ServicesOther";
 import AfterArrival from "@/components/layout/AfterArrival";
+import { servicePageContent } from "@/components/sections/services/content";
 import automation from "@/data/automation-control.json";
 
-export default function ServicesAutomationControl() {
+export default function ServicesAutomationControl({ content }) {
+  const page = servicePageContent(automation, content);
+
   return (
     <>
-      <ServicesHero hero={automation.hero} />
+      <ServicesHero hero={page.hero} />
 
       <AfterArrival>
-        <ServicesOverview intro={automation.intro} />
-        <ServicesFeatures blocks={automation.blocks} cta />
+        <ServicesOverview intro={page.intro} />
+        <ServicesFeatures blocks={page.blocks} cta />
         <ServicesOther />
       </AfterArrival>
     </>

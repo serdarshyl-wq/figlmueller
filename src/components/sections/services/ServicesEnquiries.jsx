@@ -6,7 +6,18 @@ const ASIDE =
 const LEFT_OVERHANG = "translate-x-[-0.55em]";
 const RIGHT_OVERHANG = "translate-x-[0.15em]";
 
-export default function ServicesEnquiries() {
+const TITLE_LINES = ["Machinery", "Enquiries"];
+const ASIDE_WORDS = { left: "Tech", right: "Talk" };
+
+export default function ServicesEnquiries({ content }) {
+  const titleLines = content?.titleLines?.length
+    ? content.titleLines
+    : TITLE_LINES;
+  const aside = {
+    left: content?.asideLeft || ASIDE_WORDS.left,
+    right: content?.asideRight || ASIDE_WORDS.right,
+  };
+
   return (
     <section
       aria-labelledby="services-enquiries-heading"
@@ -18,10 +29,10 @@ export default function ServicesEnquiries() {
         className="enquiries-aside pointer-events-none absolute inset-x-0 top-1/2 flex -translate-y-1/2 items-center justify-between text-black/12"
       >
         <span className={`block whitespace-nowrap ${LEFT_OVERHANG} ${ASIDE}`}>
-          Tech
+          {aside.left}
         </span>
         <span className={`block whitespace-nowrap ${RIGHT_OVERHANG} ${ASIDE}`}>
-          Talk
+          {aside.right}
         </span>
       </span>
 
@@ -30,9 +41,12 @@ export default function ServicesEnquiries() {
           id="services-enquiries-heading"
           className="enquiries-title font-display text-[clamp(2rem,5.2vw,5rem)] font-medium uppercase leading-[0.95] tracking-[-0.02em]"
         >
-          Machinery
-          <br />
-          Enquiries
+          {titleLines.map((line, index) => (
+            <span key={line}>
+              {index > 0 ? <br /> : null}
+              {line}
+            </span>
+          ))}
         </h2>
 
         <LetsTalkButton tone="dark" />

@@ -45,7 +45,8 @@ export const mission = section("aboutMission", "Mission & vision", [
     type: "image",
     options: { hotspot: true },
     description:
-      "Stands upright in the middle of the screen and turns over. An upright picture - it is cut to the shape of the card.",
+      "Stands upright in the middle of the screen and turns over. An upright picture - the card is cut to the shape of it.",
+    validation: (rule) => rule.required(),
   },
   {
     name: "backImage",
@@ -54,6 +55,7 @@ export const mission = section("aboutMission", "Mission & vision", [
     options: { hotspot: true },
     description:
       "What the card turns over onto, opened out to fill the screen and darkened under the words.",
+    validation: (rule) => rule.required(),
   },
   line("backImageAlt", "Behind the card, described", 160, null),
 ]);

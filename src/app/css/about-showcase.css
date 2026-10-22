@@ -22,7 +22,7 @@
   }
 
   .about-showcase .showcase-tile {
-    @apply flex aspect-4/5 items-center justify-center border border-white/10 bg-white/6;
+    @apply relative flex aspect-4/5 items-center justify-center overflow-hidden border border-white/10 bg-white/6;
   }
 
   .about-showcase .showcase-tile span {

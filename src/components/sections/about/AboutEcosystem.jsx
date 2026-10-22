@@ -1,3 +1,4 @@
+import Image from "next/image";
 
 const HEADING_EYEBROW = "Three companies";
 const HEADING = "Industrial ecosystem";
@@ -20,12 +21,9 @@ const COMPANIES = [
 export default function AboutEcosystem({ content }) {
   const headingEyebrow = content?.eyebrow || HEADING_EYEBROW;
   const heading = content?.heading || HEADING;
-  /* Three, and the row is built for three: what is written in the studio is
-     read over the three the section ships with rather than replacing them. */
-  const companies = COMPANIES.map((company, index) => ({
-    name: content?.companies?.[index]?.name || company.name,
-    body: content?.companies?.[index]?.body || company.body,
-  }));
+  /* As many as are written, three to a row - and the companies the section
+     ships with where nothing has been written yet. */
+  const companies = content?.companies?.length ? content.companies : COMPANIES;
 
   return (
     <section
@@ -48,15 +46,25 @@ export default function AboutEcosystem({ content }) {
 
       <ul className="mt-[7svh] grid grid-cols-1 gap-[2.5vw] md:grid-cols-3">
         {companies.map((company, index) => (
-          <li key={company.name}>
+          <li key={company.id || company.name}>
 
             <div
-              className="flex h-[38svh] w-full items-center justify-center border border-white/10 bg-white/6"
+              className="relative flex h-[38svh] w-full items-center justify-center overflow-hidden border border-white/10 bg-white/6"
               aria-hidden="true"
             >
-              <span className="font-display text-[clamp(0.7rem,0.9vw,1rem)] font-normal uppercase tracking-[0.24em] text-white/35">
-                Placeholder {index + 1}
-              </span>
+              {company.image?.url ? (
+                <Image
+                  src={company.image.url}
+                  alt=""
+                  fill
+                  sizes="(min-width: 768px) 31vw, 92vw"
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <span className="font-display text-[clamp(0.7rem,0.9vw,1rem)] font-normal uppercase tracking-[0.24em] text-white/35">
+                  Placeholder {index + 1}
+                </span>
+              )}
             </div>
 
             <h3 className="mt-6 font-display text-[clamp(0.95rem,1.35vw,1.6rem)] font-medium uppercase tracking-[0.02em]">

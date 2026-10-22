@@ -18,6 +18,7 @@ export const philosophy = section(
       options: { hotspot: true },
       description:
         "Set between the two words, at a little under half the width of the screen.",
+      validation: (rule) => rule.required(),
     },
     line("imageAlt", "Picture, described", 160, null),
     {

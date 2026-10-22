@@ -3,16 +3,19 @@ import ServicesOverview from "@/components/sections/services/ServicesOverview";
 import ServicesFeatures from "@/components/sections/services/ServicesFeatures";
 import ServicesOther from "@/components/sections/services/ServicesOther";
 import AfterArrival from "@/components/layout/AfterArrival";
+import { servicePageContent } from "@/components/sections/services/content";
 import machinery from "@/data/custom-machinery.json";
 
-export default function ServicesCustomMachinery() {
+export default function ServicesCustomMachinery({ content }) {
+  const page = servicePageContent(machinery, content);
+
   return (
     <>
-      <ServicesHero hero={machinery.hero} />
+      <ServicesHero hero={page.hero} />
 
       <AfterArrival>
-        <ServicesOverview intro={machinery.intro} />
-        <ServicesFeatures blocks={machinery.blocks} cta />
+        <ServicesOverview intro={page.intro} />
+        <ServicesFeatures blocks={page.blocks} cta />
         <ServicesOther />
       </AfterArrival>
     </>

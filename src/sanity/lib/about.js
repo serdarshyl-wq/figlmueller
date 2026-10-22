@@ -16,6 +16,11 @@ const PICTURE = `{
 
 const only = (type, projection) => `*[_type == "${type}"][0]${projection}`;
 
+/*
+ * A company carries the pictures of its own pass of the slider, so the row of
+ * cards and the field that passes through them are read from one list.
+ */
+
 const QUERY = `{
   "opening": ${only(
     "aboutOpening",
@@ -30,8 +35,19 @@ const QUERY = `{
     "aboutPhilosophy",
     `{ headingLeft, headingRight, body, imageAlt, image ${PICTURE} }`
   )},
-  "ecosystem": ${only("aboutEcosystem", `{ eyebrow, heading, companies }`)},
-  "showcase": ${only("aboutShowcase", `{ companies }`)},
+  "ecosystem": ${only(
+    "aboutEcosystem",
+    `{
+       eyebrow,
+       heading,
+       companies[]{
+         "id": _key,
+         name, body, word,
+         image ${PICTURE},
+         gallery[]${PICTURE}
+       }
+     }`
+  )},
   "founder": ${only(
     "aboutFounder",
     `{ headingLines, leftLabel, rightLabel,

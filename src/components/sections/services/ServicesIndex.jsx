@@ -9,6 +9,8 @@ import useReducedMotion from "@/hooks/useReducedMotion";
 import useIsCompact from "@/hooks/useIsCompact";
 import driveOnScroll from "@/lib/scrub";
 
+const HEADING = "All Services";
+
 const SERVICES = [
   {
     label: "Automation & Control",
@@ -70,7 +72,17 @@ function ServiceCard({ service }) {
   );
 }
 
-function ServicesStack() {
+/* Three cards, and the stack is built for three: where each one goes is the
+   site's own, and what is written on it is read over the card in its place. */
+const cardsFrom = (content) =>
+  SERVICES.map((service, index) => ({
+    ...service,
+    label: content?.cards?.[index]?.label || service.label,
+    image: content?.cards?.[index]?.image?.url || service.image,
+    alt: content?.cards?.[index]?.alt || service.alt,
+  }));
+
+function ServicesStack({ services, heading }) {
   const rootRef = useRef(null);
   const prefersReducedMotion = useReducedMotion();
   const animated = !prefersReducedMotion;
@@ -147,13 +159,13 @@ function ServicesStack() {
       className={`services-stack relative w-full bg-black [--runway:3] ${animated ? "h-[calc(var(--runway)*100vh)]" : ""
         }`}
     >
-      <h1 className="sr-only">All Services</h1>
+      <h1 className="sr-only">{heading}</h1>
 
       <div
         className={`stack-pane relative overflow-hidden ${animated ? "sticky top-0" : ""
           }`}
       >
-        {SERVICES.map((service, index) => (
+        {services.map((service, index) => (
           <div
             key={service.href}
             style={{ zIndex: index + 1 }}
@@ -167,10 +179,13 @@ function ServicesStack() {
   );
 }
 
-export default function ServicesIndex() {
+export default function ServicesIndex({ content }) {
   const isCompact = useIsCompact();
+  const services = cardsFrom(content);
 
-  if (isCompact) return <ServicesStack />;
+  const heading = content?.heading || HEADING;
+
+  if (isCompact) return <ServicesStack services={services} heading={heading} />;
 
   return (
     <section
@@ -179,11 +194,11 @@ export default function ServicesIndex() {
       className="w-full bg-bone pt-[clamp(8rem,15vh,12rem)] text-black"
     >
       <h1 className="pb-[6vh] text-center font-display text-[clamp(2rem,4.6vw,4.5rem)] font-medium uppercase leading-[0.95] tracking-[-0.02em]">
-        All Services
+        {heading}
       </h1>
 
       <div className="grid auto-rows-[62vh] grid-cols-1 gap-[1vw] px-[1.7vw] pb-[1.7vw] sm:grid-cols-2">
-        {SERVICES.map((service) => (
+        {services.map((service) => (
           <ServiceCard key={service.href} service={service} />
         ))}
       </div>

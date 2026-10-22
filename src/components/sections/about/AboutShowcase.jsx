@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Image from "next/image";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import useReducedMotion from "@/hooks/useReducedMotion";
@@ -9,41 +10,122 @@ import useIsTablet from "@/hooks/useIsTablet";
 import { getLenis } from "@/lib/lenis";
 import driveOnScroll from "@/lib/scrub";
 
+/*
+ * The companies, as the section ships with them. They are written in the
+ * studio under the row of cards above this section - one list, read twice -
+ * and what is here is what the page falls back to.
+ */
 const COMPANIES = [
-  { id: "figlmueller", word: "Figlmueller", label: "Figlmueller Industrial" },
-  { id: "fillwaves", word: "FillWaves", label: "FillWaves Contracting" },
-  { id: "windle", word: "Windle", label: "Windle Engineering" },
+  { word: "Figlmueller", label: "Figlmueller Industrial" },
+  { word: "FillWaves", label: "FillWaves Contracting" },
+  { word: "Windle", label: "Windle Engineering" },
 ];
 
+/* Every card is a picture of its own, added one at a time in the studio. A
+   company with none yet carries its name alone. */
+const CARDS_MOST = 20;
 
-const CARDS = [
-  { cx: 6, cy: 12, w: 9, h: 12 },
-  { cx: 18, cy: 5, w: 7, h: 9 },
-  { cx: 35, cy: 12, w: 8, h: 11 },
-  { cx: 45, cy: 9, w: 6, h: 8 },
-  { cx: 51, cy: 14, w: 6.5, h: 9 },
-  { cx: 66, cy: 16, w: 13, h: 17 },
-  { cx: 79, cy: 8, w: 6.5, h: 9 },
-  { cx: 92, cy: 9, w: 8, h: 10.5 },
-  { cx: 9, cy: 42, w: 12, h: 16 },
-  { cx: 22, cy: 36, w: 6, h: 8 },
-  { cx: 30, cy: 40, w: 6.5, h: 9 },
-  { cx: 78, cy: 44, w: 6.5, h: 9 },
-  { cx: 90, cy: 46, w: 10, h: 13 },
-  { cx: 20, cy: 62, w: 7, h: 9.5 },
-  { cx: 37, cy: 66, w: 8, h: 11 },
-  { cx: 52, cy: 60, w: 6, h: 8 },
-  { cx: 63, cy: 68, w: 7, h: 9 },
-  { cx: 88, cy: 66, w: 8, h: 10.5 },
-  { cx: 7, cy: 86, w: 7, h: 9 },
-  { cx: 20, cy: 88, w: 9, h: 12 },
-  { cx: 36, cy: 90, w: 7, h: 9.5 },
-  { cx: 47, cy: 92, w: 8, h: 10.5 },
-  { cx: 61, cy: 88, w: 9, h: 12 },
-  { cx: 74, cy: 90, w: 8, h: 10.5 },
-  { cx: 92, cy: 88, w: 9, h: 12 },
-];
+/*
+ * Where the cards are laid out, for however many there are.
+ *
+ * The screen is cut up and handed out: it is split in two, then one of the
+ * largest pieces is split again, and again, until there is a piece for every
+ * card. Every piece is used, so the field reaches every corner whether it
+ * holds five cards or twenty - with five, each one is simply enormous. The
+ * cuts are uneven and taken at the longer side, which is what leaves cards of
+ * every size and shape rather than a grid of one.
+ *
+ * What keeps the field breathing is that a card does not fill its piece. It
+ * takes somewhere between half and most of it, across and down by different
+ * amounts, and sits where it likes inside what is left - so the black between
+ * two cards is wide in one place and narrow in the next, and never a gutter
+ * running the length of the screen.
+ *
+ * No two cards can meet: each is held inside its own piece, and the pieces are
+ * cut from one another rather than placed.
+ */
+const FIELD_SHAPE = 1.7; /* the screen the field is cut for */
+const CUT_LEAST = 0.36; /* the smallest share a cut may leave */
+const CUT_MOST = 0.64;
+const CARD_LEAST = 0.52; /* of its own piece */
+const CARD_MOST = 0.92;
+const KEEP_CLEAR = 0.025; /* of the piece, on every side, whatever else */
 
+/* The same field every time, and the same on the server as in the browser:
+   stirred from the card's own place in the list rather than from chance. */
+const wobble = (seed) => {
+  const spun = Math.sin(seed * 12.9898) * 43758.5453;
+  return spun - Math.floor(spun);
+};
+
+/* Written out short, because a browser reads a length back rounded and the two
+   have to agree for the page to hydrate without being re-rendered. */
+const place = (share) => `${Math.round(share * 100000) / 1000}%`;
+
+function fieldFor(count) {
+  /* A company whose pictures have not been uploaded yet has no field at all. */
+  if (count < 1) return [];
+
+  const pieces = [{ x: 0, y: 0, w: 1, h: 1 }];
+  let seed = count * 3.1 + 1;
+
+  while (pieces.length < count) {
+    /* One of the largest three, so no card is cut down to a crumb while
+       another keeps half the screen. */
+    const largest = [...pieces].sort((a, b) => b.w * b.h - a.w * a.h);
+    const taken = largest[Math.floor(wobble(seed++) * Math.min(3, largest.length))];
+    const at = pieces.indexOf(taken);
+
+    const share = CUT_LEAST + (CUT_MOST - CUT_LEAST) * wobble(seed++);
+    const across = taken.w * FIELD_SHAPE >= taken.h;
+
+    pieces.splice(
+      at,
+      1,
+      across
+        ? { ...taken, w: taken.w * share }
+        : { ...taken, h: taken.h * share },
+      across
+        ? {
+          ...taken,
+          x: taken.x + taken.w * share,
+          w: taken.w * (1 - share),
+        }
+        : {
+          ...taken,
+          y: taken.y + taken.h * share,
+          h: taken.h * (1 - share),
+        }
+    );
+  }
+
+  return pieces.map((piece, index) => {
+    const seedForIt = index + 1;
+    const across =
+      CARD_LEAST + (CARD_MOST - CARD_LEAST) * wobble(seedForIt * 2.3);
+    const down =
+      CARD_LEAST + (CARD_MOST - CARD_LEAST) * wobble(seedForIt * 5.1);
+
+    const width = piece.w * across;
+    const height = piece.h * down;
+
+    /* Where in its piece it settles - hard against one side, or anywhere in
+       between - with a little kept clear whichever side it takes. */
+    const roomX = Math.max(0, piece.w - width - piece.w * KEEP_CLEAR * 2);
+    const roomY = Math.max(0, piece.h - height - piece.h * KEEP_CLEAR * 2);
+
+    return {
+      left: place(
+        piece.x + piece.w * KEEP_CLEAR + roomX * wobble(seedForIt * 8.7)
+      ),
+      top: place(
+        piece.y + piece.h * KEEP_CLEAR + roomY * wobble(seedForIt * 11.9)
+      ),
+      width: place(width),
+      height: place(height),
+    };
+  });
+}
 
 const ORIGIN_X = 0.5;
 const ORIGIN_Y = 1.05;
@@ -51,7 +133,7 @@ const EXIT_ORIGIN_Y = -0.05;
 const CONVERGE = 0.3;
 const SKEW = -16;
 
-const RUNWAY_VH = 10.5;
+const RUNWAY_PER_PASS = 3.5;
 const SCRUB = 0.1;
 const SEEK_SECONDS = 2;
 
@@ -73,7 +155,7 @@ const OUT_SPREAD = 0.9;
 const PASS_STEP = IN_SPAN + HOLD + OUT_SPREAD + OUT_IN;
 const passIn = (pass) => CARDS_AT + pass * PASS_STEP;
 const passOut = (pass) => passIn(pass) + IN_SPAN + HOLD;
-const TIMELINE_END = passIn(COMPANIES.length - 1) + IN_SPAN;
+
 const GRID_COLUMNS = 2;
 const OPENING_ROWS = 3;
 const OPENING_TILES = GRID_COLUMNS * OPENING_ROWS;
@@ -82,24 +164,27 @@ const TABLET_OPENING = TABLET_COLUMNS * OPENING_ROWS;
 
 function ShowcaseGroup({ company, opening = OPENING_TILES }) {
   const [openedAll, setOpenedAll] = useState(false);
-  const shown = openedAll ? CARDS.length : opening;
+  const shown = openedAll ? company.cards.length : opening;
 
   return (
     <li className="showcase-group">
       <h2 className="showcase-group-title">{company.label}</h2>
 
       <ul className="showcase-grid" aria-hidden="true">
-        {CARDS.slice(0, shown).map((card, tileIndex) => (
-          <li
-            key={`${card.cx}-${card.cy}-${tileIndex}`}
-            className="showcase-tile"
-          >
-            <span>{tileIndex + 1}</span>
+        {company.cards.slice(0, shown).map((card) => (
+          <li key={card.key} className="showcase-tile">
+            <Image
+              src={card.url}
+              alt=""
+              fill
+              sizes="(min-width: 768px) 33vw, 50vw"
+              className="h-full w-full object-cover"
+            />
           </li>
         ))}
       </ul>
 
-      {openedAll ? null : (
+      {openedAll || company.cards.length <= opening ? null : (
         <button
           type="button"
           onClick={() => setOpenedAll(true)}
@@ -113,13 +198,24 @@ function ShowcaseGroup({ company, opening = OPENING_TILES }) {
 }
 
 export default function AboutShowcase({ content }) {
-  /* Three, and the move is timed to three: what the studio holds is read over
-     the three the section ships with, so the words can change without the
-     timeline being rebuilt around a different count. */
-  const companies = COMPANIES.map((company, index) => ({
-    ...company,
-    word: content?.companies?.[index]?.word || company.word,
-    label: content?.companies?.[index]?.label || company.label,
+  /*
+   * A pass for each company that is written, carrying the pictures written
+   * with it - and the three the section ships with where nothing has been
+   * written at all.
+   */
+  const written = content?.companies?.length ? content.companies : COMPANIES;
+  const companies = written.map((company, index) => ({
+    /* The key the studio gave it: two companies may end up sharing a name,
+       and nothing else about one is unchanging. */
+    id: company.id || company.name || `company-${index + 1}`,
+    word: company.word || COMPANIES[index]?.word || company.name,
+    label: company.name || company.label,
+    cards: (company.gallery ?? [])
+      .slice(0, CARDS_MOST)
+      .map((picture, card) => ({
+        key: `${picture.url}-${card}`,
+        url: picture.url,
+      })),
   }));
 
   const rootRef = useRef(null);
@@ -128,6 +224,9 @@ export default function AboutShowcase({ content }) {
   const isCompact = useIsCompact();
   const isTablet = useIsTablet();
   const animated = !prefersReducedMotion && !isCompact;
+
+  const timelineEnd = passIn(companies.length - 1) + IN_SPAN;
+  const runwayVh = companies.length * RUNWAY_PER_PASS;
 
   useGSAP(
     () => {
@@ -140,8 +239,8 @@ export default function AboutShowcase({ content }) {
       const words = root.querySelectorAll(".showcase-word");
       const tabs = root.querySelectorAll(".showcase-tab");
       const index = root.querySelector(".showcase-index");
-      const cards = root.querySelectorAll(".showcase-card");
-      if (!pane || !index || !words.length || !tabs.length || !cards.length) {
+      const fields = Array.from(root.querySelectorAll(".showcase-field"));
+      if (!pane || !index || !words.length || !tabs.length || !fields.length) {
         return;
       }
 
@@ -151,37 +250,49 @@ export default function AboutShowcase({ content }) {
       const build = () => {
         tl?.kill();
 
-        gsap.set(cards, { x: 0, y: 0, scale: 1, skewX: 0 });
-
         const paneBox = pane.getBoundingClientRect();
         const originX = paneBox.left + paneBox.width * ORIGIN_X;
         const originY = paneBox.top + paneBox.height * ORIGIN_Y;
         const exitY = paneBox.top + paneBox.height * EXIT_ORIGIN_Y;
 
-        const items = Array.from(cards).map((card) => {
-          const box = card.getBoundingClientRect();
-          const cardX = box.left + box.width / 2;
-          const cardY = box.top + box.height / 2;
-          const dx = cardX - originX;
-          const dy = cardY - originY;
-          const ex = cardX - originX;
-          const ey = cardY - exitY;
+        /* Each field is measured where it lies, with the stagger read from its
+           own furthest card - so a field of five opens as evenly as one of
+           twenty rather than in a fraction of the time. */
+        const passes = fields.map((field) => {
+          /* A company whose pictures have not been uploaded yet has no cards
+             at all: its pass carries the name across on its own. */
+          const cards = Array.from(field.querySelectorAll(".showcase-card"));
+          if (cards.length) gsap.set(cards, { x: 0, y: 0, scale: 1, skewX: 0 });
+
+          const items = cards.map((card) => {
+            const box = card.getBoundingClientRect();
+            const cardX = box.left + box.width / 2;
+            const cardY = box.top + box.height / 2;
+            const dx = cardX - originX;
+            const dy = cardY - originY;
+            const ey = cardY - exitY;
+
+            return {
+              card,
+              inX: -dx * (1 - CONVERGE),
+              inY: -dy * (1 - CONVERGE),
+              outX: -dx * (1 - CONVERGE),
+              outY: -ey * (1 - CONVERGE),
+              entering: Math.hypot(dx, dy),
+              leaving: Math.hypot(dx, ey),
+            };
+          });
 
           return {
-            card,
-            inX: -dx * (1 - CONVERGE),
-            inY: -dy * (1 - CONVERGE),
-            outX: -ex * (1 - CONVERGE),
-            outY: -ey * (1 - CONVERGE),
-            entering: Math.hypot(dx, dy),
-            leaving: Math.hypot(ex, ey),
+            items,
+            furthestIn:
+              items.reduce((most, item) => Math.max(most, item.entering), 0) ||
+              1,
+            furthestOut:
+              items.reduce((most, item) => Math.max(most, item.leaving), 0) ||
+              1,
           };
         });
-
-        const furthestIn =
-          items.reduce((most, item) => Math.max(most, item.entering), 0) || 1;
-        const furthestOut =
-          items.reduce((most, item) => Math.max(most, item.leaving), 0) || 1;
 
         gsap.set(words, { autoAlpha: 0 });
         gsap.set(tabs, { opacity: TAB_DIM });
@@ -194,8 +305,8 @@ export default function AboutShowcase({ content }) {
           TITLE_AT
         );
 
-        COMPANIES.forEach((_, pass) => {
-          const last = pass === COMPANIES.length - 1;
+        companies.forEach((_, pass) => {
+          const last = pass === companies.length - 1;
           const nameAt =
             pass === 0 ? TITLE_AT : passOut(pass - 1) + TITLE_SWAP_LEAD;
 
@@ -220,55 +331,44 @@ export default function AboutShowcase({ content }) {
               passOut(pass)
             );
           }
-        });
 
-        items.forEach((item) => {
-          const { card, inX, inY, outX, outY } = item;
+          const { items, furthestIn, furthestOut } = passes[pass];
 
-          gsap.set(card, {
-            autoAlpha: 0,
-            x: inX,
-            y: inY,
-            scale: CONVERGE,
-            skewX: SKEW,
-          });
+          items.forEach((item) => {
+            const { card, inX, inY, outX, outY } = item;
 
+            gsap.set(card, {
+              autoAlpha: 0,
+              x: inX,
+              y: inY,
+              scale: CONVERGE,
+              skewX: SKEW,
+            });
 
-          const inDelay = (item.entering / furthestIn) * CARDS_SPREAD;
-          const outDelay = (item.leaving / furthestOut) * OUT_SPREAD;
-
-          COMPANIES.forEach((_, pass) => {
-            const at = passIn(pass) + inDelay;
-            const placed = {
-              x: 0,
-              y: 0,
-              scale: 1,
-              skewX: 0,
-              duration: CARDS_IN,
-              ease: "power3.out",
-            };
-
-            if (pass === 0) {
-              tl.to(card, placed, at);
-            } else {
-
-              tl.fromTo(
-                card,
-                { x: inX, y: inY, scale: CONVERGE, skewX: SKEW },
-                { ...placed, immediateRender: false },
-                at
-              );
-            }
+            const at =
+              passIn(pass) + (item.entering / furthestIn) * CARDS_SPREAD;
 
             tl.to(
+              card,
+              {
+                x: 0,
+                y: 0,
+                scale: 1,
+                skewX: 0,
+                duration: CARDS_IN,
+                ease: "power3.out",
+              },
+              at
+            ).to(
               card,
               { autoAlpha: 1, duration: CARDS_IN * 0.4, ease: "power1.out" },
               at
             );
 
-            if (pass === COMPANIES.length - 1) return;
+            if (last) return;
 
-            const leaves = passOut(pass) + outDelay;
+            const leaves =
+              passOut(pass) + (item.leaving / furthestOut) * OUT_SPREAD;
 
             tl.to(
               card,
@@ -289,7 +389,7 @@ export default function AboutShowcase({ content }) {
           });
         });
 
-        tl.to({}, { duration: 0 }, TIMELINE_END);
+        tl.to({}, { duration: 0 }, timelineEnd);
       };
 
       build();
@@ -345,7 +445,7 @@ export default function AboutShowcase({ content }) {
       };
     },
 
-    { dependencies: [animated], revertOnUpdate: true }
+    { dependencies: [animated, companies.length], revertOnUpdate: true }
   );
 
   if (isCompact) {
@@ -371,31 +471,51 @@ export default function AboutShowcase({ content }) {
       ref={rootRef}
       aria-labelledby="showcase-heading"
       className="relative z-10 bg-black text-white"
-      style={animated ? { height: `${RUNWAY_VH * 100}vh` } : undefined}
+      style={animated ? { height: `${runwayVh * 100}vh` } : undefined}
     >
       <div
         className={`showcase-pane relative h-svh overflow-hidden ${animated ? "sticky top-0" : ""
           }`}
       >
-        <ul aria-hidden="true">
-          {CARDS.map((card, cardIndex) => (
-            <li
-              key={`${card.cx}-${card.cy}-${cardIndex}`}
-              style={{
-                left: `calc(${card.cx}% - ${card.w / 2}vw)`,
-                top: `calc(${card.cy}% - ${card.h / 2}vw)`,
-                width: `${card.w}vw`,
-                height: `${card.h}vw`,
-              }}
-              className={`showcase-card absolute flex items-center justify-center border border-white/10 bg-white/6 will-change-transform ${animated ? "invisible" : ""
-                }`}
-            >
-              <span className="font-display text-[0.6rem] font-normal uppercase tracking-[0.2em] text-white/35">
-                {cardIndex + 1}
-              </span>
-            </li>
-          ))}
-        </ul>
+        {names.map((company) => (
+          <ul
+            key={company.id}
+            className="showcase-field absolute inset-0"
+            aria-hidden="true"
+          >
+            {fieldFor(company.cards.length).map((cell, cardIndex) => {
+              const card = company.cards[cardIndex];
+
+              return (
+                <li
+                  key={card.key}
+                  style={{
+                    left: cell.left,
+                    top: cell.top,
+                    width: cell.width,
+                    height: cell.height,
+                  }}
+                  className="absolute"
+                >
+                  <div
+                    className={`showcase-card absolute inset-0 overflow-hidden will-change-transform ${animated ? "invisible" : ""
+                      }`}
+                  >
+                    {/* The picture as it was uploaded: a card can take half
+                        the screen, and these are what the field is for. */}
+                    <Image
+                      src={card.url}
+                      alt=""
+                      fill
+                      unoptimized
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        ))}
 
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center px-6">
 
