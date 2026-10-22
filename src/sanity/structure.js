@@ -1,6 +1,10 @@
 import { aboutSections } from "@/sanity/schemaTypes/about";
 import { homeSections } from "@/sanity/schemaTypes/home";
-import { servicePages, servicesSections } from "@/sanity/schemaTypes/services";
+import {
+  citrinePage,
+  servicePages,
+  servicesSections,
+} from "@/sanity/schemaTypes/services";
 
 /*
  * The studio's own left-hand list.
@@ -57,4 +61,7 @@ export const structure = (S) =>
         S.divider(),
         ...servicePages.map((page) => servicePageItem(S, page)),
       ]),
+      /* One page rather than a folder of sections: it is written as a page in
+         the studio the way the service pages are. */
+      servicePageItem(S, citrinePage),
     ]);

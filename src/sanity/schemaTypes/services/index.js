@@ -17,3 +17,12 @@ export const servicePages = [
   { slug: "services-custom-machinery", title: "Custom Machinery" },
   { slug: "services-app-locations-areas", title: "Applications" },
 ];
+
+/*
+ * The Citrine page is written the same way - a head, an opening, a run of
+ * systems - so it is the same document type, read at its own route. It is not
+ * one of the services, and it is not listed with them: it is the machine the
+ * site is built around, and it ends on a sign-off of its own that no service
+ * page has.
+ */
+export const citrinePage = { slug: "citrine", title: "Citrine® Machine" };
