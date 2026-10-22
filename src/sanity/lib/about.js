@@ -16,11 +16,6 @@ const PICTURE = `{
 
 const only = (type, projection) => `*[_type == "${type}"][0]${projection}`;
 
-/*
- * A company carries the pictures of its own pass of the slider, so the row of
- * cards and the field that passes through them are read from one list.
- */
-
 const QUERY = `{
   "opening": ${only(
     "aboutOpening",
@@ -43,9 +38,9 @@ const QUERY = `{
        companies[]{
          "id": _key,
          name, body, word,
-         image ${PICTURE},
-         gallery[]${PICTURE}
-       }
+         image ${PICTURE}
+       },
+       passes[]{ company, pictures[]${PICTURE} }
      }`
   )},
   "founder": ${only(
@@ -57,12 +52,41 @@ const QUERY = `{
 
 const REVALIDATE_SECONDS = 60;
 
+/*
+ * The slider is written under the companies as a pass apiece, each one holding
+ * the company it belongs to by name and nothing else but pictures. They are
+ * handed back to their company here, so the section is given one list the way
+ * it reads it - a company with no pass gets an empty field and is simply not
+ * passed through.
+ */
+function joinPasses(page) {
+  const ecosystem = page?.ecosystem;
+  if (!ecosystem) return page;
+
+  const { passes = [], companies = [], ...rest } = ecosystem;
+
+  return {
+    ...page,
+    ecosystem: {
+      ...rest,
+      companies: companies.map((company) => ({
+        ...company,
+        gallery:
+          passes.find((pass) => pass?.company === company?.name)?.pictures ??
+          [],
+      })),
+    },
+  };
+}
+
 export async function getAboutPage() {
   try {
-    return await client.fetch(
-      QUERY,
-      {},
-      { next: { revalidate: REVALIDATE_SECONDS } }
+    return joinPasses(
+      await client.fetch(
+        QUERY,
+        {},
+        { next: { revalidate: REVALIDATE_SECONDS } }
+      )
     );
   } catch (error) {
     console.error("[sanity] the about page could not be read:", error.message);

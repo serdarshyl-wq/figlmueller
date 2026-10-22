@@ -11,9 +11,10 @@ import { getLenis } from "@/lib/lenis";
 import driveOnScroll from "@/lib/scrub";
 
 /*
- * The companies, as the section ships with them. They are written in the
- * studio under the row of cards above this section - one list, read twice -
- * and what is here is what the page falls back to.
+ * The companies, as the section ships with them. In the studio they are
+ * written once as the row of cards above this section, and a pass of this
+ * slider is handed one of them by name - so what flies past here is never a
+ * company of its own. What is below is what the page falls back to.
  */
 const COMPANIES = [
   { word: "Figlmueller", label: "Figlmueller Industrial" },
