@@ -1,4 +1,5 @@
 import { client } from "@/sanity/lib/client";
+import { CHANNELS } from "@/sanity/lib/contact";
 
 /*
  * The home page, as the site reads it.
@@ -48,7 +49,8 @@ const QUERY = `{
   "contactIntro": ${only(
     "homeNextGenMachinery",
     `{ displayLines, heading, lead, actions, imageAlt, image ${PICTURE} }`
-  )}
+  )},
+  "channels": ${CHANNELS}
 }`;
 
 /*

@@ -2,6 +2,7 @@ import ContactChannels from "@/components/sections/contact/ContactChannels";
 import ContactAddresses from "@/components/sections/contact/ContactAddresses";
 import PageTransition from "@/components/layout/PageTransition";
 import AfterArrival from "@/components/layout/AfterArrival";
+import { getContactPage } from "@/sanity/lib/contact";
 
 export const metadata = {
   title: "Contact — Figlmueller Ind | L.L.C",
@@ -9,7 +10,11 @@ export const metadata = {
     "Machinery enquiries, technical discussions, project partnerships and custom system development — Figlmueller Ind, Dubai.",
 };
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  /* Both bands are written in the studio; either one left empty is the list
+     the page ships with rather than a hole in it. */
+  const content = await getContactPage();
+
   return (
     <PageTransition>
       <main className="flex-1 bg-bone text-black">
@@ -17,7 +22,10 @@ export default function ContactPage() {
 
         {/* The page opens on the same list the home page closes with, held to
             one screen. */}
-        <ContactChannels className="contact-page-channels h-svh" />
+        <ContactChannels
+          className="contact-page-channels h-svh"
+          topics={content?.channels?.topics}
+        />
 
         {/* Not held back with the arrival: below the full width the two bands
             are read one after the other, so the addresses are on the first
@@ -25,7 +33,7 @@ export default function ContactPage() {
             landed. They are a block of type - there is nothing here worth
             holding a transition for. The hold itself stays, for the scroll lock
             and the page's own memory. */}
-        <ContactAddresses />
+        <ContactAddresses addresses={content?.addresses?.addresses} />
 
         <AfterArrival />
       </main>

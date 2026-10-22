@@ -1,5 +1,7 @@
 import { aboutSections } from "@/sanity/schemaTypes/about";
+import { contactSections } from "@/sanity/schemaTypes/contact";
 import { homeSections } from "@/sanity/schemaTypes/home";
+import { resourcesSections } from "@/sanity/schemaTypes/resources";
 import {
   citrinePage,
   servicePages,
@@ -61,7 +63,19 @@ export const structure = (S) =>
         S.divider(),
         ...servicePages.map((page) => servicePageItem(S, page)),
       ]),
+      folder(
+        S,
+        "contactpage",
+        "Contact",
+        contactSections.map((section) => sectionItem(S, section))
+      ),
       /* One page rather than a folder of sections: it is written as a page in
          the studio the way the service pages are. */
       servicePageItem(S, citrinePage),
+      folder(
+        S,
+        "resourcespage",
+        "Resources",
+        resourcesSections.map((section) => sectionItem(S, section))
+      ),
     ]);

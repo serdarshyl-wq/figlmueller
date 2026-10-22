@@ -53,7 +53,35 @@ const TOPICS = [
 const LABEL_CLASS =
   "channel-label block w-full font-display text-[clamp(1.9rem,6.4vw,7rem)] font-semibold uppercase leading-[1.05] tracking-tight text-[#2D2A2A] transition-opacity duration-500 group-hover:opacity-60";
 
-export default function ContactChannels({ className = "min-h-svh" }) {
+/*
+ * What is written in the studio is said rather than typed as a link: an
+ * address, a number or a place. The mark it is read under and what clicking it
+ * does are worked out from that here, so neither is something an editor can
+ * get wrong.
+ */
+const MARKS = { email: "E.", phone: "T.", place: "L." };
+
+const opens = (kind, value) => {
+  if (kind === "email") return `mailto:${value}`;
+  if (kind === "phone") return `tel:${value.replace(/[^+\d]/g, "")}`;
+  return undefined;
+};
+
+const written = (topics) =>
+  topics.map((topic) => ({
+    label: topic.label,
+    details: (topic.details ?? [])
+      .filter((detail) => detail?.value)
+      .map((detail) => ({
+        tag: MARKS[detail.kind] ?? MARKS.place,
+        value: detail.value,
+        href: opens(detail.kind, detail.value),
+      })),
+  }));
+
+export default function ContactChannels({ className = "min-h-svh", topics }) {
+  /* As it is written in the studio, or the list the site ships with. */
+  const list = topics?.length ? written(topics) : TOPICS;
   const isCompact = useIsCompact();
   const [openTopic, setOpenTopic] = useState(null);
 
@@ -62,7 +90,7 @@ export default function ContactChannels({ className = "min-h-svh" }) {
       className={`contact-channels relative flex items-center justify-center px-6 py-24 ${className}`}
     >
       <ul className="flex flex-col items-center text-center">
-        {TOPICS.map((topic) => {
+        {list.map((topic) => {
           const open = isCompact && openTopic === topic.label;
 
           return (

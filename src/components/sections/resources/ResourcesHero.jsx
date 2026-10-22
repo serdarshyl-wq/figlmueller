@@ -8,24 +8,35 @@ import useReducedMotion from "@/hooks/useReducedMotion";
 import { ARRIVAL_MS, arrivedByNavigation } from "@/lib/arrival";
 import driveOnScroll, { afterFonts } from "@/lib/scrub";
 
-const VIDEO_SRC = "/resources-assets/resources-dummy-video.mp4";
-const POSTER_SRC = "/resources-assets/resources-first-frame.jpg";
+/*
+ * What the screen ships with, and what it falls back to: a statement is a row
+ * or two of type, and the studio writes one as a line or two of text.
+ */
+const FALLBACK = {
+  video: { url: "/resources-assets/resources-dummy-video.mp4" },
+  poster: "/resources-assets/resources-first-frame.jpg",
+  statements: [
+    ["Built for", "contractors"],
+    ["consultants"],
+    ["partners"],
+    ["and", "technical visitors"],
+  ],
+  stackRows: ["Technical", "Resources", "and Media"],
+};
+
+const TALL_MEDIA = "(max-aspect-ratio: 1/1)";
+
+const ROWS_MOST = 2;
+const rowsOf = (statement) =>
+  String(statement)
+    .split("\n")
+    .map((row) => row.trim())
+    .filter(Boolean)
+    .slice(0, ROWS_MOST);
+
 const PLAY_BY_MS = 1500;
 const PLAY_AFTER_MS = 900;
 
-const LINES = [
-  ["Built for", "contractors"],
-  ["consultants"],
-  ["partners"],
-  ["and", "technical visitors"],
-];
-
-const WIDEST = LINES.flat().reduce(
-  (most, row) => (row.length > most.length ? row : most),
-  ""
-);
-const TALLEST = LINES.reduce((most, rows) => Math.max(most, rows.length), 1);
-const STACK = ["Technical", "Resources", "and Media"];
 const STACK_OFFSET_CHARS = 2;
 const SCRUB = 0.1;
 const COMPACT_MAX = 1279;
@@ -34,25 +45,50 @@ const LINE_IN = 1.4;
 const LINE_OUT = 1.4;
 const LINE_STEP = 2;
 const LINE_LEAD = 0.5;
-const STATEMENTS_END = LINE_AT + LINE_STEP * (LINES.length - 1) + LINE_IN;
-const CLEAR_AT = STATEMENTS_END + 0.8;
-const ROW_AT = CLEAR_AT + 0.4;
+const CLEAR_AFTER = 0.8;
+const ROW_LEAD = 0.4;
 const ROW_PASS = 6;
-const PLATE_AT = CLEAR_AT;
 const PLATE_IN = 2.3;
 const PHONE_RISE = 4;
 const PHONE_HOLD = 2.8;
 const PROBE_PX = 200;
 const STATEMENT_FILL = 1;
 const STATEMENT_MAX = 0.21;
-const FALLBACK = [
+const BEHIND = [
   { opacity: 0.45, blur: 7 },
   { opacity: 0.2, blur: 14 },
 ];
-const FALLBACK_IN = 1.2;
-const FALLBACK_AT = ROW_PASS * 0.3;
+const BEHIND_IN = 1.2;
+const BEHIND_AT = ROW_PASS * 0.3;
 
-export default function ResourcesHero() {
+export default function ResourcesHero({ content }) {
+  /* Written in the studio, or what the screen ships with. */
+  const wide = content?.video?.wide?.url ? content.video.wide : FALLBACK.video;
+  const tall = content?.video?.tall?.url ? content.video.tall : null;
+  const poster = content?.poster?.url || FALLBACK.poster;
+
+  const statements = content?.statements?.length
+    ? content.statements.map(rowsOf)
+    : FALLBACK.statements;
+  const stackRows = content?.stackRows?.length
+    ? content.stackRows
+    : FALLBACK.stackRows;
+
+  /* The widest row and the deepest statement: the heading is held open to
+     them, so the ones read in after it do not move the screen. */
+  const widest = statements
+    .flat()
+    .reduce((most, row) => (row.length > most.length ? row : most), "");
+  const tallest = statements.reduce(
+    (most, rows) => Math.max(most, rows.length),
+    1
+  );
+
+  /* The timeline is as long as there are statements to read in. */
+  const clearAt =
+    LINE_AT + LINE_STEP * (statements.length - 1) + LINE_IN + CLEAR_AFTER;
+  const rowsAt = clearAt + ROW_LEAD;
+
   const rootRef = useRef(null);
   const videoRef = useRef(null);
   const prefersReducedMotion = useReducedMotion();
@@ -182,7 +218,7 @@ export default function ResourcesHero() {
           let behindBy = 0;
           rowAt = rows.map((_, index) => {
             if (index > 0) behindBy += steps[index - 1] ?? 0;
-            return ROW_AT + behindBy / speed;
+            return rowsAt + behindBy / speed;
           });
         }
 
@@ -203,7 +239,7 @@ export default function ResourcesHero() {
           tl.to(
             line,
             { yPercent: -100, duration: LINE_OUT, ease: "power2.inOut" },
-            last ? CLEAR_AT : at + LINE_STEP - LINE_LEAD
+            last ? clearAt : at + LINE_STEP - LINE_LEAD
           );
         });
 
@@ -212,8 +248,8 @@ export default function ResourcesHero() {
           tl.to(
             [plate, stack],
             { yPercent: 0, duration: PHONE_RISE, ease: "none" },
-            PLATE_AT
-          ).to({}, { duration: 0 }, PLATE_AT + PHONE_RISE + PHONE_HOLD);
+            clearAt
+          ).to({}, { duration: 0 }, clearAt + PHONE_RISE + PHONE_HOLD);
 
           return;
         }
@@ -221,7 +257,7 @@ export default function ResourcesHero() {
         tl.to(
           plate,
           { autoAlpha: 1, duration: PLATE_IN, ease: "power2.inOut" },
-          PLATE_AT
+          clearAt
         );
 
         rows.forEach((row, index) => {
@@ -238,17 +274,17 @@ export default function ResourcesHero() {
           );
 
           for (let behind = 0; behind < index; behind += 1) {
-            const step = FALLBACK[Math.min(index - behind, FALLBACK.length) - 1];
+            const step = BEHIND[Math.min(index - behind, BEHIND.length) - 1];
 
             tl.to(
               rows[behind],
               {
                 opacity: step.opacity,
                 filter: `blur(${step.blur}px)`,
-                duration: FALLBACK_IN,
+                duration: BEHIND_IN,
                 ease: "power2.out",
               },
-              at + FALLBACK_AT
+              at + BEHIND_AT
             );
           }
         });
@@ -294,7 +330,7 @@ export default function ResourcesHero() {
         tl?.kill();
       };
     },
-    { dependencies: [animated] }
+    { dependencies: [animated, statements.length, stackRows.length] }
   );
 
   return (
@@ -311,18 +347,23 @@ export default function ResourcesHero() {
           }`}
       >
 
+        {/* The tall cut is offered first and taken only by a screen taller
+            than it is wide; the wide one carries no condition, so it is what
+            every other screen loads. */}
         <video
           ref={videoRef}
           className="absolute inset-0 h-full w-full object-cover"
-          src={VIDEO_SRC}
-          poster={POSTER_SRC}
+          poster={poster}
           loop
           muted
           playsInline
           preload="none"
           aria-hidden="true"
           tabIndex={-1}
-        />
+        >
+          {tall ? <source src={tall.url} media={TALL_MEDIA} /> : null}
+          <source src={wide.url} />
+        </video>
 
         <div
           className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/70 via-black/10 to-transparent"
@@ -341,17 +382,17 @@ export default function ResourcesHero() {
             id="resources-heading"
             className="resources-statements relative text-center font-display text-[clamp(1.75rem,7vw,10rem)] font-semibold uppercase leading-[1.04] tracking-[-0.03em]"
           >
-            {Array.from({ length: TALLEST }).map((_, row) => (
+            {Array.from({ length: tallest }).map((_, row) => (
               <span
                 key={row}
                 aria-hidden="true"
                 className="invisible block whitespace-nowrap"
               >
-                {WIDEST}
+                {widest}
               </span>
             ))}
 
-            {LINES.map((rows) => (
+            {statements.map((rows) => (
               <span
                 key={rows.join(" ")}
                 className="absolute inset-0 block overflow-hidden"
@@ -378,7 +419,7 @@ export default function ResourcesHero() {
               aria-hidden="true"
               className="invisible absolute left-0 top-0 whitespace-pre"
             >
-              {STACK.map((row) => (
+              {stackRows.map((row) => (
 
                 <span key={row} className="resources-measure inline-block">
                   {row.slice(0, STACK_OFFSET_CHARS)}
@@ -386,7 +427,7 @@ export default function ResourcesHero() {
               ))}
             </span>
 
-            {STACK.map((row) => (
+            {stackRows.map((row) => (
               <span
                 key={row}
                 className="resources-row block whitespace-nowrap will-change-transform"

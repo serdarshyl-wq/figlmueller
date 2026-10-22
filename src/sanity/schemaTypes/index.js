@@ -1,6 +1,8 @@
 import { aboutSections } from "./about";
+import { contactSections } from "./contact";
 import { homeSections } from "./home";
 import { responsiveVideo } from "./objects/responsiveVideo";
+import { resourcesSections } from "./resources";
 import { servicePage } from "./servicePage";
 import { servicesSections } from "./services";
 
@@ -13,6 +15,8 @@ export const singletons = [
   ...homeSections,
   ...aboutSections,
   ...servicesSections,
+  ...contactSections,
+  ...resourcesSections,
 ];
 
 export const madeInCode = [...singletons, servicePage];

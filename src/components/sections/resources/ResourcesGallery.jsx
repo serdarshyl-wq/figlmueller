@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -10,7 +10,9 @@ import ResourcesPanel from "@/components/sections/resources/ResourcesPanel";
 import { getLenis } from "@/lib/lenis";
 import { afterFonts } from "@/lib/scrub";
 
-const ITEMS = [
+/* The list as the page ships with it, and what it falls back to line by line
+   where the studio has been left empty. */
+const SHIPPED = [
   { title: "Company brochure", image: "/resources-assets/resources-dummy1.jpeg" },
   {
     title: "Machine technical overview",
@@ -34,14 +36,17 @@ const ITEMS = [
 ];
 
 const PARAM = "item";
-const SLUGS = ITEMS.map(({ title }) =>
-  title
+
+/* What a resource is called in the address bar while its panel is open, so a
+   panel can be linked to and comes back open when that link is followed. */
+const slugOf = (title) =>
+  String(title)
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "")
-);
+    .replace(/(^-|-$)/g, "");
 
 const CTA_LABEL = "More info";
+const PANEL_NOTE = "Coming soon";
 const CTA_FONT = "var(--cta-font, 0.92rem)";
 const RUNWAY_VH = 10;
 const SCRUB = 0.1;
@@ -66,13 +71,29 @@ const IMAGE_EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
 const DIM = 0.7;
 const DIM_IN = 0.6;
 
-const TIMELINE_END = ITEMS_AT + ITEM_STEP * (ITEMS.length - 1) + SLOT_IN + 0.4;
+const TIMELINE_TAIL = SLOT_IN + 0.4;
 
 const SEEK_SECONDS = 1.2;
 
 const ARRIVED = 0.002;
 
-export default function ResourcesGallery() {
+export default function ResourcesGallery({ content }) {
+  /* Written in the studio, or the list the page ships with. */
+  const items = content?.items?.length ? content.items : SHIPPED;
+  const ctaLabel = content?.ctaLabel || CTA_LABEL;
+  const panelNote = content?.panelNote || PANEL_NOTE;
+
+  /* Each resource is called by its own address while it is open, so a panel
+     can be linked to. It is written in the studio, and worked out from the
+     name where it has not been. */
+  const slugs = useMemo(
+    () => items.map((item) => item.slug || slugOf(item.title)),
+    [items]
+  );
+
+  /* The timeline is as long as there are lines to read in. */
+  const timelineEnd = ITEMS_AT + ITEM_STEP * (items.length - 1) + TIMELINE_TAIL;
+
   const rootRef = useRef(null);
   const seekRef = useRef(null);
   const prefersReducedMotion = useReducedMotion();
@@ -84,15 +105,18 @@ export default function ResourcesGallery() {
 
   const pushedRef = useRef(false);
 
-  const openPanel = useCallback((index) => {
-    window.history.pushState(
-      null,
-      "",
-      `${window.location.pathname}?${PARAM}=${SLUGS[index]}`
-    );
-    pushedRef.current = true;
-    setPanel({ open: true, index });
-  }, []);
+  const openPanel = useCallback(
+    (index) => {
+      window.history.pushState(
+        null,
+        "",
+        `${window.location.pathname}?${PARAM}=${slugs[index]}`
+      );
+      pushedRef.current = true;
+      setPanel({ open: true, index });
+    },
+    [slugs]
+  );
 
   const closePanel = useCallback(() => {
     if (pushedRef.current) {
@@ -108,7 +132,7 @@ export default function ResourcesGallery() {
   useEffect(() => {
     const sync = () => {
       const slug = new URLSearchParams(window.location.search).get(PARAM);
-      const index = slug ? SLUGS.indexOf(slug) : -1;
+      const index = slug ? slugs.indexOf(slug) : -1;
 
       pushedRef.current = false;
       setPanel((current) =>
@@ -119,7 +143,7 @@ export default function ResourcesGallery() {
     sync();
     window.addEventListener("popstate", sync);
     return () => window.removeEventListener("popstate", sync);
-  }, []);
+  }, [slugs]);
 
   useGSAP(
     () => {
@@ -171,7 +195,7 @@ export default function ResourcesGallery() {
           ITEMS_AT - DIM_IN
         );
 
-        ITEMS.forEach((_, index) => {
+        items.forEach((_, index) => {
           const at = ITEMS_AT + index * ITEM_STEP;
 
           if (index > 0) {
@@ -213,7 +237,7 @@ export default function ResourcesGallery() {
           }
         });
 
-        tl.to({}, { duration: 0 }, TIMELINE_END);
+        tl.to({}, { duration: 0 }, timelineEnd);
       };
 
       build();
@@ -246,10 +270,10 @@ export default function ResourcesGallery() {
       let heldUntil = 0;
 
       const cueAt = (progress) => {
-        const time = progress * TIMELINE_END;
+        const time = progress * timelineEnd;
         if (time < ITEMS_AT) return -1;
         return Math.min(
-          ITEMS.length - 1,
+          items.length - 1,
           Math.floor((time - ITEMS_AT) / ITEM_STEP)
         );
       };
@@ -355,7 +379,7 @@ export default function ResourcesGallery() {
         tl?.kill();
       };
     },
-    { dependencies: [animated] }
+    { dependencies: [animated, items.length] }
   );
 
   return (
@@ -375,7 +399,7 @@ export default function ResourcesGallery() {
         </h2>
 
         <div className="absolute inset-0" aria-hidden="true">
-          {ITEMS.map((item, index) => {
+          {items.map((item, index) => {
             const here = !animated || index <= reached;
             const first = index === 0;
 
@@ -394,7 +418,7 @@ export default function ResourcesGallery() {
                 }}
               >
                 <Image
-                  src={item.image}
+                  src={item.image?.url || item.image}
                   alt=""
                   fill
                   sizes="100vw"
@@ -411,7 +435,7 @@ export default function ResourcesGallery() {
             } ${reached < 0 && animated ? "text-black" : "text-white"}`}
           style={{ transitionDuration: `${OPEN_MS}ms`, transitionTimingFunction: IMAGE_EASE }}
         >
-          {ITEMS.map((item, index) => (
+          {items.map((item, index) => (
             <li
               key={item.title}
               className={`gallery-line ${animated ? "will-change-transform" : ""}`}
@@ -433,10 +457,10 @@ export default function ResourcesGallery() {
                   <ActionButton
                     className={`gallery-cta ${animated ? "invisible" : ""}`}
                     style={{ fontSize: CTA_FONT }}
-                    aria-label={`${CTA_LABEL} — ${item.title}`}
+                    aria-label={`${ctaLabel} — ${item.title}`}
                     onClick={() => openPanel(index)}
                   >
-                    {CTA_LABEL}
+                    {ctaLabel}
                   </ActionButton>
                 </span>
               </span>
@@ -447,7 +471,9 @@ export default function ResourcesGallery() {
 
       <ResourcesPanel
         open={panel.open}
-        title={ITEMS[panel.index].title}
+        title={items[panel.index]?.title ?? ""}
+        body={items[panel.index]?.body}
+        note={panelNote}
         onClose={closePanel}
       />
     </section>

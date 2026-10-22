@@ -32,7 +32,10 @@ export default async function Home() {
           <CitrineIntro content={content?.citrine} />
           <WeBuild content={content?.weBuild} />
           <RegionalGrowth content={content?.regionalGrowth} />
-          <ContactIntro content={content?.contactIntro} />
+          <ContactIntro
+            content={content?.contactIntro}
+            channels={content?.channels?.topics}
+          />
         </AfterArrival>
       </main>
     </PageTransition>

@@ -35,7 +35,7 @@ const IMAGE_START_LEFT = 0.53;
 const IMAGE_TRAVEL_FALLBACK = 24;
 const SCRUB = 0.1;
 
-export default function ContactIntro({ content }) {
+export default function ContactIntro({ content, channels }) {
   const displayLines = content?.displayLines?.length ? content.displayLines : DISPLAY_LINES;
   const heading = content?.heading || HEADING;
   const lead = content?.lead || LEAD;
@@ -219,7 +219,7 @@ export default function ContactIntro({ content }) {
         </div>
       </div>
 
-      <ContactChannels />
+      <ContactChannels topics={channels} />
     </section>
   );
 }

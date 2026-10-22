@@ -7,8 +7,9 @@ import useReducedMotion from "@/hooks/useReducedMotion";
 import LetsTalkButton from "@/components/layout/LetsTalkButton";
 import driveOnScroll, { afterFonts } from "@/lib/scrub";
 
-const LINES = ["Couldn't find the specifications", "you need?"];
-const WORD = "Figlmueller";
+/* What the screen ships with, where the studio has been left empty. */
+const SHIPPED_LINES = ["Couldn't find the specifications", "you need?"];
+const SHIPPED_WORD = "Figlmueller";
 
 const PROBE_PX = 200;
 const WORD_FILL = 0.98;
@@ -21,15 +22,21 @@ const LINE_AT = 0.2;
 const LINE_IN = 1.4;
 const LINE_STEP = 0.18;
 
-const CTA_AT = LINE_AT + LINE_STEP * (LINES.length - 1) + 0.75;
+const CTA_AFTER = 0.75;
 const CTA_IN = 1;
 
 const WORD_AT = 1.5;
 const WORD_IN = 2.3;
 
-const TIMELINE_END = Math.max(WORD_AT + WORD_IN, CTA_AT + CTA_IN);
+export default function ResourcesClosing({ content }) {
+  /* Written in the studio, or what the screen ships with. */
+  const question = content?.lines?.length ? content.lines : SHIPPED_LINES;
+  const footWord = content?.word || SHIPPED_WORD;
 
-export default function ResourcesClosing() {
+  /* The button follows the last line in, however many there are. */
+  const ctaAt = LINE_AT + LINE_STEP * (question.length - 1) + CTA_AFTER;
+  const timelineEnd = Math.max(WORD_AT + WORD_IN, ctaAt + CTA_IN);
+
   const rootRef = useRef(null);
   const prefersReducedMotion = useReducedMotion();
   const animated = !prefersReducedMotion;
@@ -67,7 +74,7 @@ export default function ResourcesClosing() {
           word.style.fontSize = "";
 
           tl = gsap.timeline({ paused: true });
-          tl.to({}, { duration: 0 }, TIMELINE_END);
+          tl.to({}, { duration: 0 }, timelineEnd);
           return;
         }
 
@@ -95,14 +102,14 @@ export default function ResourcesClosing() {
         tl.to(
           cta,
           { yPercent: 0, autoAlpha: 1, duration: CTA_IN, ease: "power2.out" },
-          CTA_AT
+          ctaAt
         ).to(
           word,
           { yPercent: 0, duration: WORD_IN, ease: "power3.out" },
           WORD_AT
         );
 
-        tl.to({}, { duration: 0 }, TIMELINE_END);
+        tl.to({}, { duration: 0 }, timelineEnd);
       };
 
       build();
@@ -143,7 +150,7 @@ export default function ResourcesClosing() {
         tl?.kill();
       };
     },
-    { dependencies: [animated] }
+    { dependencies: [animated, question.length] }
   );
 
   return (
@@ -165,7 +172,7 @@ export default function ResourcesClosing() {
               id="resources-closing-heading"
               className="closing-question font-display text-[clamp(1.5rem,4vw,4.75rem)] font-semibold uppercase leading-[1.06] tracking-[-0.03em] text-white"
             >
-              {LINES.map((line) => (
+              {question.map((line) => (
 
                 <span key={line} className="block overflow-hidden pb-[0.06em]">
                   <span
@@ -191,7 +198,7 @@ export default function ResourcesClosing() {
               className={`closing-word block whitespace-nowrap text-center font-display text-[13vw] font-bold uppercase leading-[0.82] tracking-[0.015em] text-white will-change-transform ${animated ? "translate-y-[110%]" : ""
                 }`}
             >
-              {WORD}
+              {footWord}
             </span>
           </p>
         </div>

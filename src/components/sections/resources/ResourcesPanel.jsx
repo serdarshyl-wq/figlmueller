@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Image from "next/image";
 import ClosePill from "@/components/ui/ClosePill";
 import { getLenis } from "@/lib/lenis";
 
@@ -9,7 +10,12 @@ const PANEL_EASE = "cubic-bezier(0.76, 0, 0.24, 1)";
 
 const TITLE_SIZE = "var(--panel-title, 4.7vw)";
 
-export default function ResourcesPanel({ open, title, onClose }) {
+/* Read in the middle of a panel of a resource that has not been written out
+   yet, in place of what it would otherwise say. */
+const NOTE = "Coming soon";
+
+export default function ResourcesPanel({ open, title, body, note, onClose }) {
+  const written = (body ?? []).filter((part) => part?.text || part?.image?.url);
   const closeRef = useRef(null);
 
   useEffect(() => {
@@ -77,11 +83,52 @@ export default function ResourcesPanel({ open, title, onClose }) {
           </h2>
         </div>
 
-        <div className="panel-body flex flex-1 items-center justify-center px-[3vw]">
-          <p className="panel-note font-display text-[clamp(1.4rem,3vw,3.4rem)] font-semibold uppercase leading-none tracking-[-0.02em] text-black/30">
-            Coming soon
-          </p>
-        </div>
+        {written.length ? (
+          /* What the resource says, a piece at a time, read down the panel.
+             Lenis is stopped while this is open, so the panel scrolls on its
+             own rather than taking the page with it. */
+          <div className="panel-body min-h-0 flex-1 overflow-y-auto px-[3vw] pb-[8vh] pt-[5vh]">
+            <div className="panel-reading flex flex-col gap-[4vh]">
+              {written.map((part, index) => (
+                <div key={index} className="panel-part flex flex-col gap-[2.5vh]">
+                  {part.text
+                    ? part.text
+                      .split("\n")
+                      .map((paragraph) => paragraph.trim())
+                      .filter(Boolean)
+                      .map((paragraph) => (
+                        <p
+                          key={paragraph}
+                          className="panel-text max-w-[52ch] text-[clamp(0.85rem,1.05vw,1.15rem)] leading-[1.7] tracking-[0.01em] text-black/70"
+                        >
+                          {paragraph}
+                        </p>
+                      ))
+                    : null}
+
+                  {part.image?.url ? (
+                    /* Described by the words it is set under, so it is read
+                       as part of them rather than announced again. */
+                    <Image
+                      src={part.image.url}
+                      alt=""
+                      width={part.image.width || 1600}
+                      height={part.image.height || 900}
+                      sizes="(min-width: 1280px) 40vw, 100vw"
+                      className="panel-picture h-auto w-full"
+                    />
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="panel-body flex flex-1 items-center justify-center px-[3vw]">
+            <p className="panel-note font-display text-[clamp(1.4rem,3vw,3.4rem)] font-semibold uppercase leading-none tracking-[-0.02em] text-black/30">
+              {note || NOTE}
+            </p>
+          </div>
+        )}
       </aside>
     </>
   );
