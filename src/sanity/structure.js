@@ -1,4 +1,5 @@
 import { aboutSections } from "@/sanity/schemaTypes/about";
+import { connectSections } from "@/sanity/schemaTypes/connect";
 import { contactSections } from "@/sanity/schemaTypes/contact";
 import { homeSections } from "@/sanity/schemaTypes/home";
 import { resourcesSections } from "@/sanity/schemaTypes/resources";
@@ -78,4 +79,7 @@ export const structure = (S) =>
         "Resources",
         resourcesSections.map((section) => sectionItem(S, section))
       ),
+      /* One form rather than a page of sections, reached from every Let's
+         talk on the site. */
+      ...connectSections.map((section) => sectionItem(S, section)),
     ]);

@@ -8,55 +8,61 @@ import ActionButton from "@/components/ui/ActionButton";
 import { leaveAsSheet } from "@/lib/arrival";
 import { afterFonts } from "@/lib/scrub";
 
-const HEADING = ["Project", "Enquiries"];
+/*
+ * What a box is, as against what it is called.
+ *
+ * The name of a box is what the page is wired to: it is what tells a browser
+ * to offer the reader's own address or telephone number, and what has an
+ * address checked as an address. The studio writes what a box is called and
+ * which of these it is; none of the wiring is typed there.
+ */
+const WIRING = {
+  name: { type: "text", autoComplete: "name" },
+  company: { type: "text", autoComplete: "organization" },
+  designation: { type: "text", autoComplete: "organization-title" },
+  email: { type: "email", autoComplete: "email" },
+  phone: { type: "tel", autoComplete: "tel" },
+  location: { type: "text", autoComplete: "off" },
+};
 
-const STEPS = [
-  {
-    lead: "Tell us a little bit about yourself and we will get back to you as soon as we can",
-    fields: [
-      { name: "name", label: "Name", type: "text", autoComplete: "name" },
-      {
-        name: "company",
-        label: "Company",
-        type: "text",
-        autoComplete: "organization",
-      },
-      {
-        name: "designation",
-        label: "Designation",
-        type: "text",
-        autoComplete: "organization-title",
-      },
-      { name: "email", label: "Email", type: "email", autoComplete: "email" },
-      { name: "phone", label: "Phone", type: "tel", autoComplete: "tel" },
-    ],
-    action: "Next",
-  },
-  {
-    lead: "Project details and technical requirements",
-    fields: [
-      {
-        name: "location",
-        label: "Project location",
-        type: "text",
-        autoComplete: "off",
-        optional: true,
-      },
-    ],
-    action: "Submit",
-  },
-];
+const wiringFor = (name) => WIRING[name] ?? { type: "text" };
 
-const ENQUIRY_TYPES = [
-  "Citrine® Machine",
-  "Custom Machinery",
-  "Automation and Control System",
-  "Technical Partnership",
-  "General Enquiry",
-];
+/* The sheet as it ships, and what every field falls back to. */
+const SHIPPED = {
+  headingWords: ["Project", "Enquiries"],
+  steps: [
+    {
+      lead: "Tell us a little bit about yourself and we will get back to you as soon as we can",
+      fields: [
+        { name: "name", label: "Name" },
+        { name: "company", label: "Company" },
+        { name: "designation", label: "Designation" },
+        { name: "email", label: "Email" },
+        { name: "phone", label: "Phone" },
+      ],
+      action: "Next",
+    },
+    {
+      lead: "Project details and technical requirements",
+      fields: [{ name: "location", label: "Project location", optional: true }],
+      action: "Submit",
+    },
+  ],
+  enquiryLegend: "Enquiry type",
+  enquiryTypes: [
+    "Citrine® Machine",
+    "Custom Machinery",
+    "Automation and Control System",
+    "Technical Partnership",
+    "General Enquiry",
+  ],
+  messageLabel: "Technical requirement / message *",
+  attachLabel: "Attach files",
+  previousLabel: "Previous",
+  requiredFault: "Is a required field",
+  formatFault: "Is not a valid entry",
+};
 
-const REQUIRED_FAULT = "Is a required field";
-const FORMAT_FAULT = "Is not a valid entry";
 const TURN_MS = 400;
 const PROBE_PX = 200;
 const HEADING_FILL = 0.85;
@@ -89,7 +95,23 @@ function FloatingLabel({ children, fault }) {
   );
 }
 
-export default function ConnectPanel() {
+export default function ConnectPanel({ content }) {
+  /* Written in the studio, or what the sheet ships with - field by field, so
+     one left empty is the wording the page was built with. */
+  const headingWords = content?.headingWords?.length
+    ? content.headingWords
+    : SHIPPED.headingWords;
+  const steps = content?.steps?.length ? content.steps : SHIPPED.steps;
+  const enquiryLegend = content?.enquiryLegend || SHIPPED.enquiryLegend;
+  const enquiryTypes = content?.enquiryTypes?.length
+    ? content.enquiryTypes
+    : SHIPPED.enquiryTypes;
+  const messageLabel = content?.messageLabel || SHIPPED.messageLabel;
+  const attachLabel = content?.attachLabel || SHIPPED.attachLabel;
+  const previousLabel = content?.previousLabel || SHIPPED.previousLabel;
+  const requiredFault = content?.requiredFault || SHIPPED.requiredFault;
+  const formatFault = content?.formatFault || SHIPPED.formatFault;
+
   const router = useRouter();
   const columnRef = useRef(null);
   const headingRef = useRef(null);
@@ -165,11 +187,11 @@ export default function ConnectPanel() {
     const check = (name) => {
       const input = form.elements[name];
       if (!input) return;
-      if (!input.value.trim()) faults[name] = REQUIRED_FAULT;
-      else if (!input.checkValidity()) faults[name] = FORMAT_FAULT;
+      if (!input.value.trim()) faults[name] = requiredFault;
+      else if (!input.checkValidity()) faults[name] = formatFault;
     };
 
-    STEPS[step].fields.forEach((field) => {
+    steps[step].fields.forEach((field) => {
       if (!field.optional) check(field.name);
     });
     if (step === 1) check("message");
@@ -214,7 +236,7 @@ export default function ConnectPanel() {
     box.style.height = `${box.scrollHeight}px`;
   };
 
-  const current = STEPS[step];
+  const current = steps[step];
 
   return (
     <div className="grid min-h-svh w-full grid-cols-1 md:grid-cols-2">
@@ -224,7 +246,7 @@ export default function ConnectPanel() {
             ref={headingRef}
             className="font-display text-[10vw] font-medium uppercase leading-[0.9] tracking-[-0.035em]"
           >
-            {HEADING.map((word) => (
+            {headingWords.map((word) => (
               <span key={word} className="block">
 
                 <span className="connect-word inline-block whitespace-nowrap">
@@ -260,12 +282,14 @@ export default function ConnectPanel() {
               {current.fields.map((field) => {
                 const fault = errors[field.name];
 
+                const wiring = wiringFor(field.name);
+
                 return (
                   <label key={field.name} className="relative block">
                     <input
                       name={field.name}
-                      type={field.type}
-                      autoComplete={field.autoComplete}
+                      type={wiring.type}
+                      autoComplete={wiring.autoComplete}
                       required={!field.optional}
                       placeholder=" "
                       defaultValue={values[field.name] ?? ""}
@@ -296,11 +320,11 @@ export default function ConnectPanel() {
                 <>
                   <fieldset className="pt-2">
                     <legend className={`${SMALL_TYPE} text-black/55`}>
-                      Enquiry type
+                      {enquiryLegend}
                     </legend>
 
                     <div className="mt-4 flex flex-wrap gap-2.5">
-                      {ENQUIRY_TYPES.map((type) => {
+                      {enquiryTypes.map((type) => {
                         const chosen = enquiry === type;
 
                         return (
@@ -370,7 +394,7 @@ export default function ConnectPanel() {
                     />
 
                     <FloatingLabel fault={errors.message}>
-                      Technical requirement / message *
+                      {messageLabel}
                     </FloatingLabel>
 
                     {errors.message ? (
@@ -388,7 +412,7 @@ export default function ConnectPanel() {
                     <span className={SMALL_TYPE}>
                       {files.length
                         ? files.join(", ")
-                        : "Attach files"}
+                        : attachLabel}
                     </span>
 
                     <input
@@ -418,7 +442,7 @@ export default function ConnectPanel() {
                 className={`cursor-pointer ${step === 0 ? "invisible" : ""
                   }`}
               >
-                Previous
+                {previousLabel}
               </ActionButton>
 
               <ActionButton type="submit" className="cursor-pointer">
