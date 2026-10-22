@@ -1,4 +1,4 @@
-import { line, lines, section } from "../fields";
+import { line, lines, paragraph, section } from "../fields";
 
 /*
  * The sheet that slides in behind every Let's talk: the name of the page down
@@ -103,6 +103,14 @@ export const panel = section("connectPanel", "Let's talk", [
     description:
       "The form is read in two: who is writing, and then what about. The second screen carries the kinds of enquiry, the message and the attachments as well.",
   },
+  {
+    name: "inbox",
+    title: "Where enquiries are sent",
+    type: "string",
+    description:
+      "The address a filled-in form arrives at. The sender's own address is set as the one to reply to, so answering the mail answers them. Changing it here changes where the next enquiry goes - nothing else has to be touched.",
+    validation: (rule) => rule.required().email(),
+  },
   line("enquiryLegend", "Over the kinds of enquiry", 34, "Small, above the row of them."),
   {
     name: "enquiryTypes",
@@ -121,6 +129,24 @@ export const panel = section("connectPanel", "Let's talk", [
   ),
   line("attachLabel", "The attachment line", 30, "Beside the paperclip, until a file is picked."),
   line("previousLabel", "The way back", 16, "The button that returns to the first screen."),
+  line(
+    "sendingLabel",
+    "The button while it is sending",
+    20,
+    "In place of the button's own words for the moment the enquiry is on its way."
+  ),
+  paragraph(
+    "sentMessage",
+    "Said when it has been sent",
+    200,
+    "Read in place of the form once the enquiry has arrived."
+  ),
+  paragraph(
+    "failedMessage",
+    "Said when it could not be sent",
+    200,
+    "Read under the button where the enquiry did not get through - worth ending with the address they can write to instead."
+  ),
   line(
     "requiredFault",
     "Said when a box is left empty",

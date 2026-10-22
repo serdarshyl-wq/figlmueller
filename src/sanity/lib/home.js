@@ -20,7 +20,15 @@ const PICTURE = `{
   "height": asset->metadata.dimensions.height
 }`;
 
-const CUT = `{ "url": file.asset->url }`;
+/* A cut carries the film and, behind it, the same film as an MP4. Both come
+   back with the format they are in, because that is what the browser reads to
+   decide which of them it can take. */
+const CUT = `{
+  "files": [file, backup][defined(asset)]{
+    "url": asset->url,
+    "type": asset->mimeType
+  }
+}`;
 
 const only = (type, projection) => `*[_type == "${type}"][0]${projection}`;
 
@@ -37,7 +45,10 @@ const QUERY = `{
     "homeSiteReadyMachinery",
     `{ headingLines, body, imageAlt, image ${PICTURE} }`
   )},
-  "citrine": ${only("homeCitrine", `{ leadIn, heading, cta }`)},
+  "citrine": ${only(
+    "homeCitrine",
+    `{ leadIn, heading, cta, video{ wide ${CUT}, tall ${CUT} } }`
+  )},
   "weBuild": ${only(
     "homeWeBuild",
     `{ headingWords, disciplines, footnotes, cta }`

@@ -59,9 +59,18 @@ const SHIPPED = {
   messageLabel: "Technical requirement / message *",
   attachLabel: "Attach files",
   previousLabel: "Previous",
+  sendingLabel: "Sending",
+  sentMessage:
+    "Thank you - your enquiry is with us. We will come back to you as soon as we can.",
+  failedMessage:
+    "It did not get through. Please try again, or write to us at info@figlmueller.ae.",
   requiredFault: "Is a required field",
   formatFault: "Is not a valid entry",
 };
+
+/* A box no reader can see and no reader fills in: what fills it is not a
+   reader, and what it sends goes no further than the route. */
+const TRAP = "companyUrl";
 
 const TURN_MS = 400;
 const PROBE_PX = 200;
@@ -109,6 +118,9 @@ export default function ConnectPanel({ content }) {
   const messageLabel = content?.messageLabel || SHIPPED.messageLabel;
   const attachLabel = content?.attachLabel || SHIPPED.attachLabel;
   const previousLabel = content?.previousLabel || SHIPPED.previousLabel;
+  const sendingLabel = content?.sendingLabel || SHIPPED.sendingLabel;
+  const sentMessage = content?.sentMessage || SHIPPED.sentMessage;
+  const failedMessage = content?.failedMessage || SHIPPED.failedMessage;
   const requiredFault = content?.requiredFault || SHIPPED.requiredFault;
   const formatFault = content?.formatFault || SHIPPED.formatFault;
 
@@ -123,6 +135,9 @@ export default function ConnectPanel({ content }) {
   const [errors, setErrors] = useState({});
   const [values, setValues] = useState({});
   const [enquiry, setEnquiry] = useState(null);
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [failed, setFailed] = useState(false);
   const [ink, setInk] = useState({ "--ink-x": "50%", "--ink-y": "50%" });
   const [files, setFiles] = useState([]);
 
@@ -179,9 +194,51 @@ export default function ConnectPanel({ content }) {
     }, TURN_MS);
   };
 
+  /*
+   * What was typed on both screens, gathered into one post.
+   *
+   * The first screen is no longer on the page by the time the form is sent -
+   * it was taken down when the sheet turned - so what is on screen is read off
+   * the form and laid over what was remembered when it turned. Files are
+   * carried as they are, one entry each.
+   */
+  const send = async (form) => {
+    const typed = { ...values };
+    const files = [];
+
+    new FormData(form).forEach((value, key) => {
+      if (typeof value === "string") typed[key] = value;
+      else if (value?.size) files.push([key, value]);
+    });
+
+    const payload = new FormData();
+    Object.entries(typed).forEach(([key, value]) => {
+      if (value) payload.append(key, value);
+    });
+    files.forEach(([key, file]) => payload.append(key, file));
+
+    setFailed(false);
+    setSending(true);
+
+    try {
+      const reply = await fetch("/api/enquiry", {
+        method: "POST",
+        body: payload,
+      });
+
+      if (!reply.ok) throw new Error(String(reply.status));
+      setSent(true);
+    } catch {
+      setFailed(true);
+    } finally {
+      setSending(false);
+    }
+  };
+
   const submit = (event) => {
     event.preventDefault();
     const form = event.currentTarget;
+    if (sending) return;
 
     const faults = {};
     const check = (name) => {
@@ -209,6 +266,7 @@ export default function ConnectPanel({ content }) {
       return;
     }
 
+    send(form);
   };
 
   const pick = (event, type) => {
@@ -263,6 +321,18 @@ export default function ConnectPanel({ content }) {
           <ClosePill onClick={close} />
         </div>
 
+        {sent ? (
+          /* The form is done with: what is left is the word that it arrived,
+             set where the questions were. */
+          <div className="connect-sent flex flex-1 flex-col justify-center">
+            <p
+              role="status"
+              className="connect-sent-note max-w-[34ch] font-display text-[clamp(1.1rem,1.9vw,2.2rem)] font-medium uppercase leading-[1.18] tracking-[-0.01em]"
+            >
+              {sentMessage}
+            </p>
+          </div>
+        ) : (
         <div
           className={`flex flex-1 flex-col ${turning ? "transition-opacity ease-out" : ""
             } ${showing ? "opacity-100" : "opacity-0"}`}
@@ -429,9 +499,29 @@ export default function ConnectPanel({ content }) {
                       }
                     />
                   </label>
+
+                  {/* Left where a reader cannot reach it: off the screen, out
+                      of the tab order and not announced. */}
+                  <input
+                    type="text"
+                    name={TRAP}
+                    tabIndex={-1}
+                    autoComplete="off"
+                    aria-hidden="true"
+                    className="absolute left-[-9999px] h-0 w-0 opacity-0"
+                  />
                 </>
               ) : null}
             </div>
+
+            {failed ? (
+              <p
+                role="alert"
+                className={`connect-failed mt-[3vh] max-w-[46ch] ${SMALL_TYPE} leading-[1.6] text-[#e12727]`}
+              >
+                {failedMessage}
+              </p>
+            ) : null}
 
             <div className="connect-actions mt-auto flex items-center justify-between gap-6 pt-[6vh]">
 
@@ -445,12 +535,18 @@ export default function ConnectPanel({ content }) {
                 {previousLabel}
               </ActionButton>
 
-              <ActionButton type="submit" className="cursor-pointer">
-                {current.action}
+              <ActionButton
+                type="submit"
+                disabled={sending}
+                aria-busy={sending ? "true" : undefined}
+                className={`cursor-pointer ${sending ? "opacity-60" : ""}`}
+              >
+                {sending ? sendingLabel : current.action}
               </ActionButton>
             </div>
           </form>
         </div>
+        )}
       </div>
     </div>
   );

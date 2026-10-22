@@ -14,7 +14,14 @@ const PICTURE = `{
   "height": asset->metadata.dimensions.height
 }`;
 
-const CUT = `{ "url": file.asset->url }`;
+/* The film, and behind it the same film as an MP4: the browser is given both
+   and takes the first it can read. */
+const CUT = `{
+  "files": [file, backup][defined(asset)]{
+    "url": asset->url,
+    "type": asset->mimeType
+  }
+}`;
 
 const only = (type, projection) => `*[_type == "${type}"][0]${projection}`;
 

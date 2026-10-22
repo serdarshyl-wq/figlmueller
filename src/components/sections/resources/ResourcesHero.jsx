@@ -6,6 +6,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import useReducedMotion from "@/hooks/useReducedMotion";
 import { ARRIVAL_MS, arrivedByNavigation } from "@/lib/arrival";
+import { filmSources, shippedSource } from "@/lib/film";
 import driveOnScroll, { afterFonts } from "@/lib/scrub";
 
 /*
@@ -13,7 +14,7 @@ import driveOnScroll, { afterFonts } from "@/lib/scrub";
  * or two of type, and the studio writes one as a line or two of text.
  */
 const FALLBACK = {
-  video: { url: "/resources-assets/resources-dummy-video.mp4" },
+  video: "/resources-assets/resources-dummy-video.mp4",
   poster: "/resources-assets/resources-first-frame.jpg",
   statements: [
     ["Built for", "contractors"],
@@ -23,8 +24,6 @@ const FALLBACK = {
   ],
   stackRows: ["Technical", "Resources", "and Media"],
 };
-
-const TALL_MEDIA = "(max-aspect-ratio: 1/1)";
 
 const ROWS_MOST = 2;
 const rowsOf = (statement) =>
@@ -63,8 +62,11 @@ const BEHIND_AT = ROW_PASS * 0.3;
 
 export default function ResourcesHero({ content }) {
   /* Written in the studio, or what the screen ships with. */
-  const wide = content?.video?.wide?.url ? content.video.wide : FALLBACK.video;
-  const tall = content?.video?.tall?.url ? content.video.tall : null;
+  /* Every file of the film, in the order the browser is offered them: the tall
+     cut first and taken only by a screen taller than it is wide, each cut as
+     WebM before MP4. Nothing uploaded is the film the screen ships with. */
+  const written = filmSources(content?.video);
+  const film = written.length ? written : shippedSource(FALLBACK.video);
   const poster = content?.poster?.url || FALLBACK.poster;
 
   const statements = content?.statements?.length
@@ -347,9 +349,7 @@ export default function ResourcesHero({ content }) {
           }`}
       >
 
-        {/* The tall cut is offered first and taken only by a screen taller
-            than it is wide; the wide one carries no condition, so it is what
-            every other screen loads. */}
+        {/* The browser takes the first source it can both match and read. */}
         <video
           ref={videoRef}
           className="absolute inset-0 h-full w-full object-cover"
@@ -361,8 +361,14 @@ export default function ResourcesHero({ content }) {
           aria-hidden="true"
           tabIndex={-1}
         >
-          {tall ? <source src={tall.url} media={TALL_MEDIA} /> : null}
-          <source src={wide.url} />
+          {film.map((source) => (
+            <source
+              key={`${source.url}-${source.media ?? ""}`}
+              src={source.url}
+              type={source.type}
+              media={source.media}
+            />
+          ))}
         </video>
 
         <div

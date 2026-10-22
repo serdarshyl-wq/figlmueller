@@ -6,7 +6,7 @@ export const openingFilm = section("homeOpeningFilm", "Opening film", [
     title: "Film",
     type: "responsiveVideo",
     description:
-      "Two cuts of the same film: wide for a desk, tall for a phone.",
+      "Two cuts of the same film: wide for a desk, tall for a phone. Between five and ten seconds long - the logo is carried up into the bar over it and the page is handed over near its end, so a shorter film is over before any of that has been read, and a longer one holds a reader on one screen.",
   },
   lines(
     "headingLines",

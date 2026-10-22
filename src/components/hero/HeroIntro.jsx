@@ -16,6 +16,7 @@ import {
   markLogoLanded,
   useLogoLanded,
 } from "@/lib/intro-store";
+import { filmSources, shippedSource } from "@/lib/film";
 import IntroLogo from "@/components/brand/IntroLogo";
 import ActionButton from "@/components/ui/ActionButton";
 
@@ -27,7 +28,7 @@ gsap.registerPlugin(ScrollTrigger);
  * values the page falls back to, not the values it prefers.
  */
 const FALLBACK = {
-  video: { wide: { url: "/hero-original.mp4" } },
+  video: "/hero-original.mp4",
   headingLines: ["Built to move", "heavy industry"],
   scrollLabel: "Scroll",
 };
@@ -53,20 +54,19 @@ const handoverAt = (video) => {
 };
 
 /*
- * Which cut of the film the screen gets.
+ * Which cut of the film the screen gets is not decided here.
  *
- * Not a width but a shape: a screen taller than it is wide is a screen a 16:9
- * film has to be cropped to the middle of, whoever is holding it - a phone
- * upright, a tablet upright. Turned on its side, either of them is a wide
- * screen again and gets the wide cut. The browser reads this off the `media`
- * on the source, so nothing here has to be decided in JavaScript.
+ * It is not a width but a shape: a screen taller than it is wide is a screen a
+ * 16:9 film has to be cropped to the middle of, whoever is holding it - a
+ * phone upright, a tablet upright. Turned on its side, either of them is a
+ * wide screen again and gets the wide cut. The browser reads that off the
+ * condition on the source, along with which format it can play, and takes the
+ * first source that answers both - which is what `filmSources` puts in order.
  *
  * It is read when the film loads and not again, so a device turned mid-intro
  * keeps the cut it started with. That is the right trade: re-picking would
  * mean reloading the film and starting the intro over.
  */
-const TALL_MEDIA = "(max-aspect-ratio: 1/1)";
-
 const SKIP_RATE = 16;
 
 const SKIP_CROSSFADE = 0.7;
@@ -80,12 +80,12 @@ export default function HeroIntro({ content }) {
   const freezeRef = useRef(null);
 
   /*
-   * The wide cut always exists - it is what every screen falls back to. The
-   * tall one is optional: without it the film is the wide cut everywhere, which
-   * is how the site read before there were two.
+   * Every file of the film, in the order the browser is offered them. Nothing
+   * uploaded at all is the film the site ships with, which is how it read
+   * before any of this was written in the studio.
    */
-  const wide = content?.video?.wide?.url ? content.video.wide : FALLBACK.video.wide;
-  const tall = content?.video?.tall?.url ? content.video.tall : null;
+  const written = filmSources(content?.video);
+  const film = written.length ? written : shippedSource(FALLBACK.video);
   const headingLines = content?.headingLines?.length
     ? content.headingLines
     : FALLBACK.headingLines;
@@ -359,9 +359,10 @@ export default function HeroIntro({ content }) {
       data-nav-dark=""
       className="hero-intro sticky top-0 z-0 h-svh w-full overflow-hidden bg-black text-white"
     >
-      {/* The tall cut is offered first and taken only by a screen taller than
-          it is wide; the wide one carries no condition, so it is what every
-          other screen - and any browser that ignores the condition - loads. */}
+      {/* In order: the tall cut, which only a screen taller than it is wide
+          takes, and then the wide one, which carries no condition and is what
+          every other screen falls to - each of them as WebM before MP4. The
+          browser takes the first it can both match and read. */}
       <video
         ref={videoRef}
         className="hero-video absolute inset-0 h-full w-full scale-110 object-cover will-change-transform"
@@ -375,8 +376,14 @@ export default function HeroIntro({ content }) {
         onEnded={release}
         onError={release}
       >
-        {tall ? <source src={tall.url} media={TALL_MEDIA} /> : null}
-        <source src={wide.url} />
+        {film.map((source) => (
+          <source
+            key={`${source.url}-${source.media ?? ""}`}
+            src={source.url}
+            type={source.type}
+            media={source.media}
+          />
+        ))}
       </video>
 
       <canvas
