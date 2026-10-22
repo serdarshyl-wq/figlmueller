@@ -2,6 +2,7 @@ import { aboutSections } from "./about";
 import { connectSections } from "./connect";
 import { contactSections } from "./contact";
 import { homeSections } from "./home";
+import { legalPage } from "./legal";
 import { responsiveVideo } from "./objects/responsiveVideo";
 import { resourcesSections } from "./resources";
 import { servicePage } from "./servicePage";
@@ -21,13 +22,13 @@ export const singletons = [
   ...connectSections,
 ];
 
-export const madeInCode = [...singletons, servicePage];
+export const madeInCode = [...singletons, servicePage, legalPage];
 
 /*
  * Everything the studio knows how to edit: the sections of the pages that are
- * kept a section at a time, the service pages, and the shapes they are built
- * out of.
+ * kept a section at a time, the service and legal pages, and the shapes they
+ * are built out of.
  */
 export const schema = {
-  types: [...singletons, servicePage, responsiveVideo],
+  types: [...singletons, servicePage, legalPage, responsiveVideo],
 };

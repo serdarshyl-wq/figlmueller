@@ -2,6 +2,7 @@ import { aboutSections } from "@/sanity/schemaTypes/about";
 import { connectSections } from "@/sanity/schemaTypes/connect";
 import { contactSections } from "@/sanity/schemaTypes/contact";
 import { homeSections } from "@/sanity/schemaTypes/home";
+import { legalPages } from "@/sanity/schemaTypes/legal";
 import { resourcesSections } from "@/sanity/schemaTypes/resources";
 import {
   citrinePage,
@@ -27,15 +28,16 @@ const sectionItem = (S, { name, title }) =>
     .id(name)
     .child(S.document().schemaType(name).documentId(name).title(title));
 
-/* A service page is a `servicePage` document, told apart by its route: the id
-   is the route, so the studio opens the page the site reads at that path. */
-const servicePageItem = (S, { slug, title }) =>
+/* A page told apart by its route rather than by its type: the id is the route,
+   so the studio opens the document the site reads at that path. The service
+   pages and the legal pages are both kept this way. */
+const pageItem = (S, type, { slug, title }) =>
   S.listItem()
     .title(title)
     .id(slug)
-    .child(
-      S.document().schemaType("servicePage").documentId(slug).title(title)
-    );
+    .child(S.document().schemaType(type).documentId(slug).title(title));
+
+const servicePageItem = (S, page) => pageItem(S, "servicePage", page);
 
 const folder = (S, id, title, items) =>
   S.listItem()
@@ -82,4 +84,11 @@ export const structure = (S) =>
       /* One form rather than a page of sections, reached from every Let's
          talk on the site. */
       ...connectSections.map((section) => sectionItem(S, section)),
+      /* The three the footer ends on. */
+      folder(
+        S,
+        "legalpages",
+        "Legal",
+        legalPages.map((page) => pageItem(S, "legalPage", page))
+      ),
     ]);
