@@ -71,7 +71,8 @@ const handoverAt = (video) => {
  * keeps the cut it started with. That is the right trade: re-picking would
  * mean reloading the film and starting the intro over.
  */
-const SKIP_RATE = 16;
+/* How long a seek is given to answer before the page is let go of anyway. */
+const SEEK_AT_MOST_MS = 1500;
 
 const SKIP_CROSSFADE = 0.7;
 
@@ -225,12 +226,24 @@ export default function HeroIntro({ content }) {
     release();
   }, [handedOver, release]);
 
+  /*
+   * Skipping is a seek rather than a sprint.
+   *
+   * The film is put at its own last three seconds - wherever that falls in
+   * whichever cut the browser loaded - and plays out from there, so a reader
+   * who skips still leaves the intro on the frame it always ends on, and a
+   * longer film does not make a longer skip.
+   *
+   * The frame on the screen is drawn into a canvas first and faded out once
+   * the new position is found: a browser shows nothing at all while it looks,
+   * and that nothing is a black screen.
+   */
   const skipIntro = useCallback(() => {
     const video = videoRef.current;
     const freeze = freezeRef.current;
     setSkipped(true);
 
-    if (!video || video.currentTime >= handoverAt(video)) {
+    if (!video) {
       release();
       return;
     }
@@ -252,36 +265,42 @@ export default function HeroIntro({ content }) {
       }
     }
 
-    try {
-      video.playbackRate = SKIP_RATE;
-    } catch {
-    }
-    video.play().catch(release);
+    const landed = () => {
+      window.clearTimeout(skipWatchRef.current);
 
-    const watch = () => {
-      const current = videoRef.current;
-      if (!current) return;
-
-      if (current.currentTime >= handoverAt(current)) {
-        current.playbackRate = 1;
-        if (frozen) {
-          gsap.to(freeze, {
-            opacity: 0,
-            duration: SKIP_CROSSFADE,
-            ease: "power2.inOut",
-          });
-        }
-        release();
-        return;
+      if (frozen) {
+        frozen = false;
+        gsap.to(freeze, {
+          opacity: 0,
+          duration: SKIP_CROSSFADE,
+          ease: "power2.inOut",
+        });
       }
 
-      skipWatchRef.current = requestAnimationFrame(watch);
+      release();
     };
 
-    skipWatchRef.current = requestAnimationFrame(watch);
+    const { duration } = video;
+    const tail = Number.isFinite(duration)
+      ? Math.max(0, duration - ARRIVAL_TAIL)
+      : video.currentTime;
+
+    video.addEventListener("seeked", landed, { once: true });
+
+    /* A seek that never answers - a cut still being fetched - must not leave
+       the page held on a frozen frame. */
+    skipWatchRef.current = window.setTimeout(landed, SEEK_AT_MOST_MS);
+
+    try {
+      video.currentTime = tail;
+    } catch {
+      landed();
+    }
+
+    video.play().catch(landed);
   }, [release]);
 
-  useEffect(() => () => cancelAnimationFrame(skipWatchRef.current), []);
+  useEffect(() => () => window.clearTimeout(skipWatchRef.current), []);
 
   useGSAP(
     () => {
