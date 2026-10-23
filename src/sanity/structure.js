@@ -4,6 +4,7 @@ import { contactSections } from "@/sanity/schemaTypes/contact";
 import { homeSections } from "@/sanity/schemaTypes/home";
 import { legalPages } from "@/sanity/schemaTypes/legal";
 import { resourcesSections } from "@/sanity/schemaTypes/resources";
+import { siteSections } from "@/sanity/schemaTypes/site";
 import {
   citrinePage,
   servicePages,
@@ -90,5 +91,13 @@ export const structure = (S) =>
         "legalpages",
         "Legal",
         legalPages.map((page) => pageItem(S, "legalPage", page))
+      ),
+      S.divider(),
+      /* What is read under or over every page rather than on one of them. */
+      folder(
+        S,
+        "sitewide",
+        "Site-wide",
+        siteSections.map((section) => sectionItem(S, section))
       ),
     ]);

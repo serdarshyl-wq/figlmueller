@@ -7,6 +7,7 @@ import { responsiveVideo } from "./objects/responsiveVideo";
 import { resourcesSections } from "./resources";
 import { servicePage } from "./servicePage";
 import { servicesSections } from "./services";
+import { siteSections } from "./site";
 
 /*
  * The documents there is one of, each read by name. They are what is taken out
@@ -20,6 +21,7 @@ export const singletons = [
   ...contactSections,
   ...resourcesSections,
   ...connectSections,
+  ...siteSections,
 ];
 
 export const madeInCode = [...singletons, servicePage, legalPage];

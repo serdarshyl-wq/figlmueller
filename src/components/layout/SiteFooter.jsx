@@ -10,42 +10,55 @@ import {
   YoutubeIcon,
 } from "@/components/layout/SocialIcons";
 
-const NOTICE =
-  "Please be informed that the intellectual property rights to all photos, designs, and other materials on this Site belong to FIGLMUELLER. You may request permission to use them by contacting us at: info@figlmueller.ae";
+/*
+ * Which mark is drawn on a social button. The studio picks one of these by
+ * name and types the address behind it; the drawing itself is the site's, so a
+ * button cannot end up carrying somebody else's logo.
+ */
+const MARKS = {
+  instagram: { label: "Instagram", Icon: InstagramIcon },
+  linkedin: { label: "LinkedIn", Icon: LinkedinIcon },
+  x: { label: "X", Icon: XIcon },
+  youtube: { label: "YouTube", Icon: YoutubeIcon },
+};
 
-const NOTICE_EMAIL = "info@figlmueller.ae";
-
-const SOCIALS = [
-  {
-    label: "Instagram",
-    href: "https://www.instagram.com/figlmueller",
-    Icon: InstagramIcon,
-  },
-  {
-    label: "LinkedIn",
-    href: "https://www.linkedin.com/company/figlmueller",
-    Icon: LinkedinIcon,
-  },
-  { label: "X", href: "https://x.com/figlmueller", Icon: XIcon },
-  {
-    label: "YouTube",
-    href: "https://www.youtube.com/@figlmueller",
-    Icon: YoutubeIcon,
-  },
-];
-
-const LEGAL_LINKS = [
-  { label: "Privacy policy", href: "/privacy-policy" },
-  { label: "Terms of use", href: "/terms-of-use" },
-  { label: "Cookies", href: "/cookies" },
-  { label: "Contact us", href: "/contact" },
-];
+/* What the foot of the site ships with, where the studio has been left
+   empty. */
+const SHIPPED = {
+  notice:
+    "Please be informed that the intellectual property rights to all photos, designs, and other materials on this Site belong to FIGLMUELLER. You may request permission to use them by contacting us at: info@figlmueller.ae",
+  noticeEmail: "info@figlmueller.ae",
+  socials: [
+    { place: "instagram", href: "https://www.instagram.com/figlmueller" },
+    { place: "linkedin", href: "https://www.linkedin.com/company/figlmueller" },
+    { place: "x", href: "https://x.com/figlmueller" },
+    { place: "youtube", href: "https://www.youtube.com/@figlmueller" },
+  ],
+  links: [
+    { label: "Privacy policy", href: "/privacy-policy" },
+    { label: "Terms of use", href: "/terms-of-use" },
+    { label: "Cookies", href: "/cookies" },
+    { label: "Contact us", href: "/contact" },
+  ],
+  copyright: "© 2026 Figlmueller.",
+  rights: "All rights reserved",
+  madeBy: { label: "Made by temnyy", href: "https://temnyy.dev" },
+};
 
 const DARK_ROUTES = ["/about", "/resources"];
 
 const BARE_ROUTES = ["/connect-us"];
 
-export default function SiteFooter() {
+export default function SiteFooter({ content }) {
+  /* Written in the studio, or what the foot ships with - field by field. */
+  const notice = content?.notice || SHIPPED.notice;
+  const noticeEmail = content?.noticeEmail || SHIPPED.noticeEmail;
+  const socials = content?.socials?.length ? content.socials : SHIPPED.socials;
+  const links = content?.links?.length ? content.links : SHIPPED.links;
+  const copyright = content?.copyright || SHIPPED.copyright;
+  const rights = content?.rights || SHIPPED.rights;
+  const madeBy = content?.madeBy?.label ? content.madeBy : SHIPPED.madeBy;
+
   const rootRef = useRef(null);
   const pathname = usePathname();
 
@@ -76,7 +89,9 @@ export default function SiteFooter() {
     (route) => pathname === route || pathname.startsWith(`${route}/`)
   );
 
-  const [before, after] = NOTICE.split(NOTICE_EMAIL);
+  /* The address is a mail link wherever it is written into the sentence, and
+     the sentence reads as it was typed where it is not in there at all. */
+  const [before, after] = notice.split(noticeEmail);
 
   if (BARE_ROUTES.some((route) => pathname === route)) return null;
 
@@ -95,42 +110,53 @@ export default function SiteFooter() {
           className={`footer-notice mx-auto max-w-[64ch] text-center text-[clamp(0.8rem,0.95vw,1.05rem)] leading-[1.6] ${muted}`}
         >
           {before}
-          <a
-            href={`mailto:${NOTICE_EMAIL}`}
-            className={`underline-offset-4 transition-colors duration-300 hover:underline ${strong}`}
-          >
-            {NOTICE_EMAIL}
-          </a>
+          {after === undefined ? null : (
+            <a
+              href={`mailto:${noticeEmail}`}
+              className={`underline-offset-4 transition-colors duration-300 hover:underline ${strong}`}
+            >
+              {noticeEmail}
+            </a>
+          )}
           {after}
         </p>
 
-        <ul className="footer-socials mt-6 flex items-center justify-center gap-3">
-          {SOCIALS.map(({ label, href, Icon }) => (
-            <li key={label}>
-              <a
-                href={href}
-                target="_blank"
-                rel="noreferrer"
-                aria-label={label}
-                className={`footer-social flex size-10 items-center justify-center rounded-full transition-colors duration-300 ${social}`}
-              >
-                <Icon className="size-4" />
-              </a>
-            </li>
-          ))}
-        </ul>
+        {socials.length ? (
+          <ul className="footer-socials mt-6 flex items-center justify-center gap-3">
+            {socials.map((account) => {
+              const mark = MARKS[account.place];
+              if (!mark || !account.href) return null;
+
+              const { label, Icon } = mark;
+
+              return (
+                <li key={account.place}>
+                  <a
+                    href={account.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={label}
+                    className={`footer-social flex size-10 items-center justify-center rounded-full transition-colors duration-300 ${social}`}
+                  >
+                    <Icon className="size-4" />
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        ) : null}
 
         <div className="footer-meta mt-8 flex flex-col items-center gap-6 font-display text-[0.85rem] font-bold uppercase tracking-[0.12em] md:grid md:grid-cols-3 md:items-center md:gap-8">
 
           <p className={`footer-copyright md:justify-self-start ${quiet}`}>
-            <span>© 2026 Figlmueller.</span> <span>All rights reserved</span>
+            <span>{copyright}</span> <span>{rights}</span>
           </p>
 
           <ul className="footer-links flex flex-wrap items-center justify-center gap-x-6 gap-y-2 md:justify-self-center">
-            {LEGAL_LINKS.map((link) => (
-              <li key={link.label}>
+            {links.map((link) => (
+              <li key={`${link.label}-${link.href}`}>
                 <Link
-                  href={link.href}
+                  href={link.href || "/"}
                   className={`transition-colors duration-300 ${quiet} ${strong}`}
                 >
                   {link.label}
@@ -139,14 +165,19 @@ export default function SiteFooter() {
             ))}
           </ul>
 
-          <a
-            href="https://temnyy.dev"
-            target="_blank"
-            rel="noreferrer"
-            className={`footer-madeby transition-colors duration-300 md:justify-self-end ${quiet} ${strong}`}
-          >
-            Made by temnyy
-          </a>
+          {madeBy?.label ? (
+            <a
+              href={madeBy.href || "#"}
+              target="_blank"
+              rel="noreferrer"
+              className={`footer-madeby transition-colors duration-300 md:justify-self-end ${quiet} ${strong}`}
+            >
+              {madeBy.label}
+            </a>
+          ) : (
+            /* Nothing in that corner, and the row still reads as three. */
+            <span aria-hidden="true" />
+          )}
         </div>
       </div>
     </footer>
