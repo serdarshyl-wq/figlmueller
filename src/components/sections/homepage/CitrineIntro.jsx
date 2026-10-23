@@ -4,7 +4,6 @@ import { useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import useReducedMotion from "@/hooks/useReducedMotion";
-import useIsCompact from "@/hooks/useIsCompact";
 import ActionButton from "@/components/ui/ActionButton";
 import { filmSources } from "@/lib/film";
 import driveOnScroll from "@/lib/scrub";
@@ -43,6 +42,9 @@ const PINNED_PX = RUNWAY_PX - PLAYOUT_PX;
    same frame twice. */
 const FRAME_SECONDS = 1 / 30;
 
+/* How long a seek is given to answer before another may be asked for. */
+const SEEK_WAIT_MS = 200;
+
 const SCRUB = 0.14;
 
 export default function CitrineIntro({ content }) {
@@ -61,20 +63,7 @@ export default function CitrineIntro({ content }) {
   const canvasRef = useRef(null);
   const videoRef = useRef(null);
   const prefersReducedMotion = useReducedMotion();
-  const isCompact = useIsCompact();
   const animated = !prefersReducedMotion;
-
-  /*
-   * Winding a film by hand is a desk's trick.
-   *
-   * Every notch of the scroll asks the decoder for a frame it has not got
-   * ready, and a phone cannot answer at that rate: the machine turns a frame
-   * at a time with the scroll waiting on it, which is worse than not turning
-   * at all. So on a phone the film is simply played, on its own, while the
-   * screen is in front of the reader - and the long runway it would have been
-   * wound along is not built.
-   */
-  const scrubbed = animated && !isCompact;
   const [ready, setReady] = useState(false);
 
   useGSAP(
@@ -100,33 +89,65 @@ export default function CitrineIntro({ content }) {
         if (video.readyState >= 2) show();
         else video.addEventListener("loadeddata", show, { once: true });
 
-        /* Played rather than wound: started when the screen comes into view
-           and stopped when it leaves, so a phone is not decoding a film that
-           is three screens away. */
-        if (!scrubbed) {
-          const watcher = new IntersectionObserver(
-            ([entry]) => {
-              if (entry.isIntersecting) video.play().catch(() => { });
-              else video.pause();
-            },
-            { threshold: 0.15 }
-          );
+        /*
+         * A film that has never been played paints nothing on a phone and
+         * decodes nothing either: the screen stays black however hard it is
+         * wound. So the first time the section comes into view the film is
+         * started and stopped in the same breath - a frame is drawn, the
+         * decoder is awake, and there is something for the scroll to wind.
+         */
+        let primed = false;
+        const prime = () => {
+          if (primed) return;
+          primed = true;
 
-          watcher.observe(root);
+          const started = video.play();
+          if (started?.then) started.then(() => video.pause()).catch(() => { });
+          else video.pause();
+        };
 
-          return () => {
-            watcher.disconnect();
-            video.removeEventListener("loadeddata", show);
-          };
-        }
+        const watcher = new IntersectionObserver(
+          ([entry]) => {
+            if (entry.isIntersecting) prime();
+          },
+          { threshold: 0.05 }
+        );
+
+        watcher.observe(root);
+
+        /*
+         * Winding is seeking, and seeking is the most expensive thing a phone
+         * can be asked for. So it is asked as rarely as the picture allows:
+         * never while a seek is still being answered, never for a step
+         * shorter than a frame, and through `fastSeek` where the browser has
+         * it - which settles on the nearest key frame instead of decoding its
+         * way to an exact one. The film is cut with a key frame every five
+         * frames for exactly this.
+         */
+        const quick = typeof video.fastSeek === "function";
+        let asked = 0;
+
+        const settled = () => {
+          asked = 0;
+        };
+
+        video.addEventListener("seeked", settled);
 
         const wind = (value) => {
           const span = video.duration;
           if (!Number.isFinite(span) || span <= 0) return;
 
+          /* One seek at a time - and if a seek is never answered, no more
+             than this long before another may be asked for. */
+          const now = performance.now();
+          if (asked && now - asked < SEEK_WAIT_MS) return;
+
           const at = Math.min(span - FRAME_SECONDS, value * span);
           if (Math.abs(video.currentTime - at) < FRAME_SECONDS) return;
-          video.currentTime = at;
+
+          asked = now;
+          if (quick) video.fastSeek(at);
+          else video.currentTime = at;
         };
 
         const scrub = driveOnScroll({
@@ -138,6 +159,8 @@ export default function CitrineIntro({ content }) {
 
         return () => {
           scrub.stop();
+          watcher.disconnect();
+          video.removeEventListener("seeked", settled);
           video.removeEventListener("loadeddata", show);
         };
       }
@@ -153,7 +176,7 @@ export default function CitrineIntro({ content }) {
       /* Only what will be painted. Where the run is not being wound - a phone,
          or a reader who has asked for less movement - that is the first frame
          and nothing else, rather than thirty-six megabytes of them. */
-      const wanted = scrubbed ? FRAME_COUNT : 1;
+      const wanted = animated ? FRAME_COUNT : 1;
 
       const frames = Array.from({ length: wanted }, (_, index) => {
         const image = new Image();
@@ -192,7 +215,7 @@ export default function CitrineIntro({ content }) {
         };
       }
 
-      if (!scrubbed) {
+      if (!animated) {
         return () => {
           frames.forEach((image) => {
             image.onload = null;
@@ -219,7 +242,7 @@ export default function CitrineIntro({ content }) {
        the media query answers, and the scroll driver set up for one must be
        taken down before the film is handed to the other. */
     {
-      dependencies: [scrubbed, film.map((source) => source.url).join()],
+      dependencies: [animated, film.map((source) => source.url).join()],
       revertOnUpdate: true,
     }
   );
@@ -233,11 +256,11 @@ export default function CitrineIntro({ content }) {
       id="citrine"
       aria-labelledby="citrine-heading"
       className="citrine-intro relative z-10 bg-black text-white"
-      style={scrubbed ? { height: `${PINNED_PX}px` } : undefined}
+      style={animated ? { height: `${PINNED_PX}px` } : undefined}
     >
       <div
         className={
-          scrubbed
+          animated
             ? "sticky top-0 h-svh overflow-hidden"
             : "relative h-svh overflow-hidden"
         }
@@ -251,8 +274,7 @@ export default function CitrineIntro({ content }) {
             className={`citrine-film absolute inset-0 h-full w-full object-cover ${shown}`}
             muted
             playsInline
-            loop={!scrubbed}
-            preload={scrubbed ? "auto" : "metadata"}
+            preload="auto"
             aria-hidden="true"
             tabIndex={-1}
           >
