@@ -23,7 +23,7 @@ const INDEX_QUERY = `*[_type == "servicesIndex"][0]{
 const PAGE_QUERY = `*[_type == "servicePage" && slug.current == $slug][0]{
   hero{ title, alt, image ${PICTURE} },
   intro,
-  blocks[]{ "id": id.current, title, body, items, image ${PICTURE} },
+  blocks[]{ "id": id.current, title, body, items, alt, image ${PICTURE} },
   closing
 }`;
 

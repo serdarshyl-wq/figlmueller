@@ -1,12 +1,16 @@
 import ConnectPanel from "@/components/sections/connect/ConnectPanel";
 import PageTransition from "@/components/layout/PageTransition";
 import { getConnectPanel } from "@/sanity/lib/connect";
+import { listingFor } from "@/sanity/lib/site";
 
-export const metadata = {
-  title: "Connect — Figlmueller Ind | L.L.C",
-  description:
-    "Project enquiries — tell us about yourself and we will get back to you as soon as we can.",
-};
+/* What this page is called in a search result is written in the studio -
+   under Site-wide, Search listings - over what it was built with. */
+export const generateMetadata = () =>
+  listingFor("/connect-us", {
+    title: "Connect — Figlmueller Ind | L.L.C",
+    description:
+      "Project enquiries — tell us about yourself and we will get back to you as soon as we can.",
+  });
 
 export default async function ConnectUsPage() {
   /* The form is a timeline of its own and cannot read the store: it is read

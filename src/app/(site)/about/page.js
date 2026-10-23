@@ -7,12 +7,16 @@ import AboutFounder from "@/components/sections/about/AboutFounder";
 import PageTransition from "@/components/layout/PageTransition";
 import AfterArrival from "@/components/layout/AfterArrival";
 import { getAboutPage } from "@/sanity/lib/about";
+import { listingFor } from "@/sanity/lib/site";
 
-export const metadata = {
-  title: "About — Figlmueller Ind | L.L.C",
-  description:
-    "Figlmueller Ind | L.L.C — industrial engineering for modern construction machinery, Dubai, UAE.",
-};
+/* What this page is called in a search result is written in the studio -
+   under Site-wide, Search listings - over what it was built with. */
+export const generateMetadata = () =>
+  listingFor("/about", {
+    title: "About — Figlmueller Ind | L.L.C",
+    description:
+      "Figlmueller Ind | L.L.C — industrial engineering for modern construction machinery, Dubai, UAE.",
+  });
 
 export default async function AboutPage() {
   const content = await getAboutPage();

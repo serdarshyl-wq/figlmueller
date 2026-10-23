@@ -30,6 +30,12 @@ const company = {
       description: "Fills the card in the row.",
     },
     line(
+      "alt",
+      "Card picture, described",
+      160,
+      "What is in the photograph, written for a search engine. The name under the card is read on its own, so this is the picture rather than the company."
+    ),
+    line(
       "word",
       "The word on the screen",
       12,

@@ -88,6 +88,7 @@ export default function AboutMission({ content }) {
     src: content?.cardImage?.url || FRONT.src,
     width: content?.cardImage?.width || FRONT.width,
     height: content?.cardImage?.height || FRONT.height,
+    alt: content?.cardImageAlt || "",
   };
   const backPicture = {
     src: content?.backImage?.url || BACK.src,
@@ -385,7 +386,7 @@ export default function AboutMission({ content }) {
           <div className="mission-face-front absolute inset-0 overflow-hidden backface-hidden transform-[translateZ(1px)]">
             <Image
               src={cardPicture.src}
-              alt=""
+              alt={cardPicture.alt}
               aria-hidden="true"
               width={cardPicture.width}
               height={cardPicture.height}

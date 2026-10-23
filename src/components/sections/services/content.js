@@ -37,6 +37,10 @@ export function servicePageContent(shipped, content) {
           block.image ||
           shippedBlock?.image ||
           shipped.hero.image,
+        /* Written for a search engine: the picture is one of a stack that
+           cross-fades, so it is hidden from a reader using a screen reader
+           and described here for everything else. */
+        alt: block.alt || shippedBlock?.alt || "",
       };
     }),
     closing: shipped.closing

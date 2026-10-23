@@ -48,6 +48,12 @@ export const mission = section("aboutMission", "Mission & vision", [
       "Stands upright in the middle of the screen and turns over. An upright picture - the card is cut to the shape of it.",
     validation: (rule) => rule.required(),
   },
+  line(
+    "cardImageAlt",
+    "The card, described",
+    160,
+    "What is in the photograph, written for a search engine."
+  ),
   {
     name: "backImage",
     title: "Behind the card",

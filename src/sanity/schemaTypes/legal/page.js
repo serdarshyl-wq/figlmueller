@@ -1,7 +1,7 @@
 import { line, paragraph } from "../fields";
 
 /*
- * A legal page: the privacy policy, the terms, the cookie notice.
+ * A legal page: the privacy policy, the terms, the cookie page.
  *
  * They are the same page three times over - a title, a line under it, the
  * date it was last changed, and a run of numbered clauses read beside an index

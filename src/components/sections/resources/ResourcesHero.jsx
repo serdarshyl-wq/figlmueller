@@ -384,10 +384,10 @@ export default function ResourcesHero({ content }) {
         />
 
         <div className="resources-slot absolute inset-x-0 bottom-[18svh] z-10 px-[3vw]">
-          <h1
-            id="resources-heading"
-            className="resources-statements relative text-center font-display text-[clamp(1.75rem,7vw,10rem)] font-semibold uppercase leading-[1.04] tracking-[-0.03em]"
-          >
+          {/* Read in one statement at a time, and set as large as the title
+              under it - but it is the lead-in rather than the name of the
+              page, so it is not what the page is headed by. */}
+          <p className="resources-statements relative text-center font-display text-[clamp(1.75rem,7vw,10rem)] font-semibold uppercase leading-[1.04] tracking-[-0.03em]">
             {Array.from({ length: tallest }).map((_, row) => (
               <span
                 key={row}
@@ -415,11 +415,16 @@ export default function ResourcesHero({ content }) {
                 </span>
               </span>
             ))}
-          </h1>
+          </p>
         </div>
 
+        {/* The name of the page, and what it is headed by: the statements
+            above lead into it and it is what is left on the screen. */}
         <div className="resources-stack pointer-events-none absolute inset-0 z-20 flex flex-col justify-center overflow-hidden px-[3vw]">
-          <h2 className="resources-stack-rows relative font-display text-[10vw] font-bold uppercase leading-[0.82] tracking-[-0.035em]">
+          <h1
+            id="resources-heading"
+            className="resources-stack-rows relative font-display text-[10vw] font-bold uppercase leading-[0.82] tracking-[-0.035em]"
+          >
 
             <span
               aria-hidden="true"
@@ -441,7 +446,7 @@ export default function ResourcesHero({ content }) {
                 {row}
               </span>
             ))}
-          </h2>
+          </h1>
         </div>
       </div>
     </section>

@@ -42,8 +42,11 @@ const SHIPPED = {
   ],
   copyright: "© 2026 Figlmueller.",
   rights: "All rights reserved",
-  madeBy: { label: "Made by temnyy", href: "https://temnyy.dev" },
 };
+
+/* The signature of whoever built the site. It is not a field in the studio and
+   it is not meant to be: it is set here, in the build. */
+const MADE_BY = { label: "Made by temnyy", href: "https://temnyy.dev" };
 
 const DARK_ROUTES = ["/about", "/resources"];
 
@@ -57,7 +60,6 @@ export default function SiteFooter({ content }) {
   const links = content?.links?.length ? content.links : SHIPPED.links;
   const copyright = content?.copyright || SHIPPED.copyright;
   const rights = content?.rights || SHIPPED.rights;
-  const madeBy = content?.madeBy?.label ? content.madeBy : SHIPPED.madeBy;
 
   const rootRef = useRef(null);
   const pathname = usePathname();
@@ -165,19 +167,14 @@ export default function SiteFooter({ content }) {
             ))}
           </ul>
 
-          {madeBy?.label ? (
-            <a
-              href={madeBy.href || "#"}
-              target="_blank"
-              rel="noreferrer"
-              className={`footer-madeby transition-colors duration-300 md:justify-self-end ${quiet} ${strong}`}
-            >
-              {madeBy.label}
-            </a>
-          ) : (
-            /* Nothing in that corner, and the row still reads as three. */
-            <span aria-hidden="true" />
-          )}
+          <a
+            href={MADE_BY.href}
+            target="_blank"
+            rel="noreferrer"
+            className={`footer-madeby transition-colors duration-300 md:justify-self-end ${quiet} ${strong}`}
+          >
+            {MADE_BY.label}
+          </a>
         </div>
       </div>
     </footer>

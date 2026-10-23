@@ -130,6 +130,7 @@ export default function AboutFounder({ content }) {
       id: BLOCKS[index]?.id ?? `block-${index + 1}`,
       title: block.title ?? BLOCKS[index]?.title,
       image: block.image?.url || block.image || BLOCKS[index]?.image,
+      alt: block.alt || "",
       paragraphs:
         block.paragraphs
           ?.map((paragraph) => paragraph.sentences ?? paragraph)
@@ -289,7 +290,7 @@ export default function AboutFounder({ content }) {
               <Image
                 key={block.id}
                 src={block.image}
-                alt=""
+                alt={block.alt}
                 aria-hidden="true"
                 width={IMAGE_SIZE.width}
                 height={IMAGE_SIZE.height}

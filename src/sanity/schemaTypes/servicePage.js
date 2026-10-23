@@ -141,6 +141,12 @@ export const servicePage = {
                 "This system's own picture, held beside the reading and faded to as it is turned to. Every system has one.",
               validation: (rule) => rule.required(),
             },
+            line(
+              "alt",
+              "Picture, described",
+              160,
+              "What is in the photograph, written for a search engine and for a reader who cannot see it. It has to describe the picture itself, so it is worth rewriting when the picture is changed."
+            ),
           ],
           preview: {
             select: { title: "title", subtitle: "body", media: "image" },

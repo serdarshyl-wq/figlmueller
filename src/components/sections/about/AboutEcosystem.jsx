@@ -55,7 +55,7 @@ export default function AboutEcosystem({ content }) {
               {company.image?.url ? (
                 <Image
                   src={company.image.url}
-                  alt=""
+                  alt={company.alt || ""}
                   fill
                   sizes="(min-width: 768px) 31vw, 92vw"
                   className="h-full w-full object-cover"

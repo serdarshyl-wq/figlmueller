@@ -13,11 +13,38 @@ const FOOTER = `*[_type == "siteFooter"][0]{
   socials[]{ place, href },
   links[]{ label, href },
   copyright,
-  rights,
-  madeBy
+  rights
 }`;
 
+/*
+ * What a page is called in a search result. Asked for by the page's own route,
+ * because that is what a line is written against in the studio - and answered
+ * with what the page was built with where nothing has been written for it, so
+ * no page is ever left without a title.
+ */
+const LISTINGS = `*[_type == "seoListings"][0].pages[]{ page, title, description }`;
+
 const REVALIDATE_SECONDS = 60;
+
+export async function listingFor(route, shipped) {
+  try {
+    const pages = await client.fetch(
+      LISTINGS,
+      {},
+      { next: { revalidate: REVALIDATE_SECONDS } }
+    );
+
+    const written = pages?.find((listing) => listing?.page === route);
+
+    return {
+      title: written?.title || shipped.title,
+      description: written?.description || shipped.description,
+    };
+  } catch (error) {
+    console.error("[sanity] the search listings could not be read:", error.message);
+    return shipped;
+  }
+}
 
 export async function getSiteFooter() {
   try {

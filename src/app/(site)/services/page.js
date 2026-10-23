@@ -3,12 +3,16 @@ import ServicesEnquiries from "@/components/sections/services/ServicesEnquiries"
 import PageTransition from "@/components/layout/PageTransition";
 import AfterArrival from "@/components/layout/AfterArrival";
 import { getServicesIndex } from "@/sanity/lib/services";
+import { listingFor } from "@/sanity/lib/site";
 
-export const metadata = {
-  title: "Services — Figlmueller Ind | L.L.C",
-  description:
-    "Automation and control, custom machinery and applications — the three lines of work Figlmueller Ind builds for.",
-};
+/* What this page is called in a search result is written in the studio -
+   under Site-wide, Search listings - over what it was built with. */
+export const generateMetadata = () =>
+  listingFor("/services", {
+    title: "Services — Figlmueller Ind | L.L.C",
+    description:
+      "Automation and control, custom machinery and applications — the three lines of work Figlmueller Ind builds for.",
+  });
 
 export default async function ServicesPage() {
   const content = await getServicesIndex();

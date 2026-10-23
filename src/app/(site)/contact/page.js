@@ -3,12 +3,16 @@ import ContactAddresses from "@/components/sections/contact/ContactAddresses";
 import PageTransition from "@/components/layout/PageTransition";
 import AfterArrival from "@/components/layout/AfterArrival";
 import { getContactPage } from "@/sanity/lib/contact";
+import { listingFor } from "@/sanity/lib/site";
 
-export const metadata = {
-  title: "Contact — Figlmueller Ind | L.L.C",
-  description:
-    "Machinery enquiries, technical discussions, project partnerships and custom system development — Figlmueller Ind, Dubai.",
-};
+/* What this page is called in a search result is written in the studio -
+   under Site-wide, Search listings - over what it was built with. */
+export const generateMetadata = () =>
+  listingFor("/contact", {
+    title: "Contact — Figlmueller Ind | L.L.C",
+    description:
+      "Machinery enquiries, technical discussions, project partnerships and custom system development — Figlmueller Ind, Dubai.",
+  });
 
 export default async function ContactPage() {
   /* Both bands are written in the studio; either one left empty is the list

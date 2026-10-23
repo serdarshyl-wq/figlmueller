@@ -1,6 +1,5 @@
 import SmoothScrollProvider from "@/components/SmoothScrollProvider";
 import SiteHeader from "@/components/layout/SiteHeader";
-import CookieNotice from "@/components/layout/CookieNotice";
 import { clashGrotesk, satoshi } from "@/lib/fonts";
 import "../globals.css";
 
@@ -15,6 +14,10 @@ export const metadata = {
  * fonts and the whole of the site's CSS, and the studio must have none of them.
  * Two roots side by side is what the group folders are for - the URLs are
  * unchanged by them.
+ *
+ * There is no cookie line here, and there is nothing for one to say: the site
+ * sets no cookies, counts nobody and writes nothing to a reader's device. What
+ * it does and does not do is written out on /cookies instead.
  */
 export default function SiteLayout({ children }) {
   return (
@@ -27,7 +30,6 @@ export default function SiteLayout({ children }) {
           <SiteHeader />
           {children}
         </SmoothScrollProvider>
-        <CookieNotice />
       </body>
     </html>
   );

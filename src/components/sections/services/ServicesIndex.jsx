@@ -55,10 +55,13 @@ function ServiceCard({ service }) {
         className="absolute inset-0 bg-linear-to-t from-black/60 via-black/10 to-transparent transition-opacity duration-700 group-hover:opacity-75"
       />
 
-      <span className="service-caption absolute inset-x-0 bottom-[8%] flex flex-col items-center gap-6 px-[6%] text-white">
-        <span className="service-name text-center font-display text-[6vw] font-medium uppercase leading-[0.95] tracking-[-0.02em] sm:text-[2.6vw]">
+      {/* A card is a service, so its name is a heading rather than a line of
+          type that happens to be large. The box around it is a div for the
+          same reason: a heading cannot sit inside a span. */}
+      <div className="service-caption absolute inset-x-0 bottom-[8%] flex flex-col items-center gap-6 px-[6%] text-white">
+        <h2 className="service-name text-center font-display text-[6vw] font-medium uppercase leading-[0.95] tracking-[-0.02em] sm:text-[2.6vw]">
           {service.label}
-        </span>
+        </h2>
 
         <span className="card-pill relative isolate inline-flex items-center rounded-full bg-white py-3 pl-6 pr-14 font-display text-[0.68rem] font-medium uppercase tracking-[0.16em] text-bone transition-colors duration-500 group-hover:text-black">
           <span
@@ -67,7 +70,7 @@ function ServiceCard({ service }) {
           />
           Learn more
         </span>
-      </span>
+      </div>
     </Link>
   );
 }

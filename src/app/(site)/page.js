@@ -8,6 +8,15 @@ import ContactIntro from "@/components/sections/homepage/ContactIntro";
 import PageTransition from "@/components/layout/PageTransition";
 import AfterArrival from "@/components/layout/AfterArrival";
 import { getHomePage } from "@/sanity/lib/home";
+import { listingFor } from "@/sanity/lib/site";
+
+/* What this page is called in a search result is written in the studio -
+   under Site-wide, Search listings - over what the site was built with. */
+export const generateMetadata = () =>
+  listingFor("/", {
+    title: "Figlmueller Ind | L.L.C",
+    description: "Figlmueller Ind | L.L.C — Dubai, UAE",
+  });
 
 /*
  * Read once, here, and handed down a section at a time.

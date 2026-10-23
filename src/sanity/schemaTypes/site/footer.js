@@ -8,6 +8,10 @@ import { line, paragraph, section } from "../fields";
  * written - the mark is chosen from the ones the site draws, and only the
  * address behind it is typed, which is what keeps a button from ending up with
  * somebody else's logo on it.
+ *
+ * The credit in the right-hand corner is not here either. It is the signature
+ * of whoever built the site and it belongs in the build, not in a field that
+ * can be emptied from the studio.
  */
 const PLACES = [
   { title: "Instagram", value: "instagram" },
@@ -100,15 +104,4 @@ export const footer = section("siteFooter", "Footer", [
     "It carries the year, so it is worth looking at every January."
   ),
   line("rights", "And after it", 40, "Set beside the line on the left, and under it where there is no room."),
-  {
-    name: "madeBy",
-    title: "The credit on the right",
-    type: "object",
-    options: { collapsible: true, collapsed: true },
-    description: "Left empty, nothing is drawn in that corner.",
-    fields: [
-      line("label", "Words", 30, null),
-      line("href", "Goes to", 120, "Opened in a new tab."),
-    ],
-  },
 ]);

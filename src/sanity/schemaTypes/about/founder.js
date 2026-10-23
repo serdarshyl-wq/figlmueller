@@ -71,6 +71,12 @@ export const founder = section("aboutFounder", "Founder", [
               "This chapter's own picture, held beside the writing and faded into the one before it. Every chapter has one.",
             validation: (rule) => rule.required(),
           },
+          line(
+            "alt",
+            "Picture, described",
+            160,
+            "What is in the photograph, written for a search engine. It has to describe the picture itself, so it is worth rewriting when the picture is changed."
+          ),
           paragraphs,
         ],
         preview: {

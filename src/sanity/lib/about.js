@@ -23,7 +23,7 @@ const QUERY = `{
   )},
   "mission": ${only(
     "aboutMission",
-    `{ eyebrow, titleLines, heldWord, panels, backImageAlt,
+    `{ eyebrow, titleLines, heldWord, panels, backImageAlt, cardImageAlt,
        cardImage ${PICTURE}, backImage ${PICTURE} }`
   )},
   "philosophy": ${only(
@@ -37,7 +37,7 @@ const QUERY = `{
        heading,
        companies[]{
          "id": _key,
-         name, body, word,
+         name, body, word, alt,
          image ${PICTURE}
        },
        passes[]{ company, pictures[]${PICTURE} }
@@ -46,7 +46,7 @@ const QUERY = `{
   "founder": ${only(
     "aboutFounder",
     `{ headingLines, leftLabel, rightLabel,
-       blocks[]{ title, paragraphs, image ${PICTURE} } }`
+       blocks[]{ title, paragraphs, alt, image ${PICTURE} } }`
   )}
 }`;
 

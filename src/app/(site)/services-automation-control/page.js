@@ -1,12 +1,16 @@
 import ServicesAutomationControl from "@/components/sections/services/ServicesAutomationControl";
 import PageTransition from "@/components/layout/PageTransition";
 import { getServicePage } from "@/sanity/lib/services";
+import { listingFor } from "@/sanity/lib/site";
 
-export const metadata = {
-  title: "Automation & Control — Figlmueller Ind | L.L.C",
-  description:
-    "PLC-driven automation and control built into every Figlmueller machine — one interface for the full production cycle.",
-};
+/* What this page is called in a search result is written in the studio -
+   under Site-wide, Search listings - over what it was built with. */
+export const generateMetadata = () =>
+  listingFor("/services-automation-control", {
+    title: "Automation & Control — Figlmueller Ind | L.L.C",
+    description:
+      "PLC-driven automation and control built into every Figlmueller machine — one interface for the full production cycle.",
+  });
 
 export default async function AutomationControlPage() {
   const content = await getServicePage("services-automation-control");

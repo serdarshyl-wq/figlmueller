@@ -4,12 +4,16 @@ import ResourcesClosing from "@/components/sections/resources/ResourcesClosing";
 import PageTransition from "@/components/layout/PageTransition";
 import AfterArrival from "@/components/layout/AfterArrival";
 import { getResourcesPage } from "@/sanity/lib/resources";
+import { listingFor } from "@/sanity/lib/site";
 
-export const metadata = {
-  title: "Resources — Figlmueller Ind | L.L.C",
-  description:
-    "Technical resources from Figlmueller Ind — built for contractors, consultants, partners and technical visitors.",
-};
+/* What this page is called in a search result is written in the studio -
+   under Site-wide, Search listings - over what it was built with. */
+export const generateMetadata = () =>
+  listingFor("/resources", {
+    title: "Resources — Figlmueller Ind | L.L.C",
+    description:
+      "Technical resources from Figlmueller Ind — built for contractors, consultants, partners and technical visitors.",
+  });
 
 export default async function ResourcesPage() {
   /* Read once, here: the three sections are timelines and cannot read the

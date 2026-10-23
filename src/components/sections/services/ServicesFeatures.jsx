@@ -58,7 +58,7 @@ export default function ServicesFeatures({ blocks, cta = false }) {
         <Image
           key={block.id}
           src={block.image}
-          alt=""
+          alt={block.alt || ""}
           aria-hidden="true"
           width={IMAGE_SIZE.width}
           height={IMAGE_SIZE.height}

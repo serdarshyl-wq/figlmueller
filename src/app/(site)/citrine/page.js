@@ -7,12 +7,16 @@ import citrine from "@/data/citrine.json";
 import { getServicePage } from "@/sanity/lib/services";
 import PageTransition from "@/components/layout/PageTransition";
 import AfterArrival from "@/components/layout/AfterArrival";
+import { listingFor } from "@/sanity/lib/site";
 
-export const metadata = {
-  title: "Citrine® Machine — Figlmueller Ind | L.L.C",
-  description:
-    "Citrine® — a fully mobile, PLC-controlled material production platform on a single trailer.",
-};
+/* What this page is called in a search result is written in the studio -
+   under Site-wide, Search listings - over what it was built with. */
+export const generateMetadata = () =>
+  listingFor("/citrine", {
+    title: "Citrine® Machine — Figlmueller Ind | L.L.C",
+    description:
+      "Citrine® — a fully mobile, PLC-controlled material production platform on a single trailer.",
+  });
 
 export default async function CitrinePage() {
   /* Written in the studio as a page of its own, over what the site ships

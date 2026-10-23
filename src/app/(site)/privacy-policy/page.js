@@ -2,12 +2,16 @@ import LegalPage from "@/components/sections/legal/LegalPage";
 import PageTransition from "@/components/layout/PageTransition";
 import AfterArrival from "@/components/layout/AfterArrival";
 import { getLegalPage } from "@/sanity/lib/legal";
+import { listingFor } from "@/sanity/lib/site";
 
-export const metadata = {
-  title: "Privacy policy — Figlmueller Ind | L.L.C",
-  description:
-    "How Figlmueller Ind | L.L.C handles the information sent through this website.",
-};
+/* What this page is called in a search result is written in the studio -
+   under Site-wide, Search listings - over what it was built with. */
+export const generateMetadata = () =>
+  listingFor("/privacy-policy", {
+    title: "Privacy policy — Figlmueller Ind | L.L.C",
+    description:
+      "How Figlmueller Ind | L.L.C handles the information sent through this website.",
+  });
 
 export default async function PrivacyPolicyPage() {
   const content = await getLegalPage("privacy-policy");
