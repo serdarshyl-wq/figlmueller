@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import useReducedMotion from "@/hooks/useReducedMotion";
+import useIsCompact from "@/hooks/useIsCompact";
 import ActionButton from "@/components/ui/ActionButton";
 import { filmSources } from "@/lib/film";
 import driveOnScroll from "@/lib/scrub";
@@ -60,7 +61,20 @@ export default function CitrineIntro({ content }) {
   const canvasRef = useRef(null);
   const videoRef = useRef(null);
   const prefersReducedMotion = useReducedMotion();
+  const isCompact = useIsCompact();
   const animated = !prefersReducedMotion;
+
+  /*
+   * Winding a film by hand is a desk's trick.
+   *
+   * Every notch of the scroll asks the decoder for a frame it has not got
+   * ready, and a phone cannot answer at that rate: the machine turns a frame
+   * at a time with the scroll waiting on it, which is worse than not turning
+   * at all. So on a phone the film is simply played, on its own, while the
+   * screen is in front of the reader - and the long runway it would have been
+   * wound along is not built.
+   */
+  const scrubbed = animated && !isCompact;
   const [ready, setReady] = useState(false);
 
   useGSAP(
@@ -86,7 +100,25 @@ export default function CitrineIntro({ content }) {
         if (video.readyState >= 2) show();
         else video.addEventListener("loadeddata", show, { once: true });
 
-        if (!animated) return () => video.removeEventListener("loadeddata", show);
+        /* Played rather than wound: started when the screen comes into view
+           and stopped when it leaves, so a phone is not decoding a film that
+           is three screens away. */
+        if (!scrubbed) {
+          const watcher = new IntersectionObserver(
+            ([entry]) => {
+              if (entry.isIntersecting) video.play().catch(() => { });
+              else video.pause();
+            },
+            { threshold: 0.15 }
+          );
+
+          watcher.observe(root);
+
+          return () => {
+            watcher.disconnect();
+            video.removeEventListener("loadeddata", show);
+          };
+        }
 
         const wind = (value) => {
           const span = video.duration;
@@ -118,7 +150,12 @@ export default function CitrineIntro({ content }) {
       canvas.width = FRAME_WIDTH;
       canvas.height = FRAME_HEIGHT;
 
-      const frames = Array.from({ length: FRAME_COUNT }, (_, index) => {
+      /* Only what will be painted. Where the run is not being wound - a phone,
+         or a reader who has asked for less movement - that is the first frame
+         and nothing else, rather than thirty-six megabytes of them. */
+      const wanted = scrubbed ? FRAME_COUNT : 1;
+
+      const frames = Array.from({ length: wanted }, (_, index) => {
         const image = new Image();
         image.decoding = "async";
         image.src = FRAME_SRC(index);
@@ -155,7 +192,13 @@ export default function CitrineIntro({ content }) {
         };
       }
 
-      if (!animated) return;
+      if (!scrubbed) {
+        return () => {
+          frames.forEach((image) => {
+            image.onload = null;
+          });
+        };
+      }
 
       const scrub = driveOnScroll({
         root,
@@ -172,7 +215,13 @@ export default function CitrineIntro({ content }) {
         });
       };
     },
-    { dependencies: [animated, film.map((source) => source.url).join()] }
+    /* Reverted when the answer changes: the screen is read as a desk's until
+       the media query answers, and the scroll driver set up for one must be
+       taken down before the film is handed to the other. */
+    {
+      dependencies: [scrubbed, film.map((source) => source.url).join()],
+      revertOnUpdate: true,
+    }
   );
 
   const shown = `transition-opacity duration-700 ${ready ? "opacity-100" : "opacity-0"
@@ -184,11 +233,11 @@ export default function CitrineIntro({ content }) {
       id="citrine"
       aria-labelledby="citrine-heading"
       className="citrine-intro relative z-10 bg-black text-white"
-      style={animated ? { height: `${PINNED_PX}px` } : undefined}
+      style={scrubbed ? { height: `${PINNED_PX}px` } : undefined}
     >
       <div
         className={
-          animated
+          scrubbed
             ? "sticky top-0 h-svh overflow-hidden"
             : "relative h-svh overflow-hidden"
         }
@@ -202,7 +251,8 @@ export default function CitrineIntro({ content }) {
             className={`citrine-film absolute inset-0 h-full w-full object-cover ${shown}`}
             muted
             playsInline
-            preload="auto"
+            loop={!scrubbed}
+            preload={scrubbed ? "auto" : "metadata"}
             aria-hidden="true"
             tabIndex={-1}
           >
