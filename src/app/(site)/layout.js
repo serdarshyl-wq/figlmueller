@@ -1,5 +1,6 @@
 import SmoothScrollProvider from "@/components/SmoothScrollProvider";
 import SiteHeader from "@/components/layout/SiteHeader";
+import { getSiteNav } from "@/sanity/lib/site";
 import { clashGrotesk, satoshi } from "@/lib/fonts";
 import "../globals.css";
 
@@ -19,7 +20,11 @@ export const metadata = {
  * sets no cookies, counts nobody and writes nothing to a reader's device. What
  * it does and does not do is written out on /cookies instead.
  */
-export default function SiteLayout({ children }) {
+export default async function SiteLayout({ children }) {
+  /* The bar is a timeline of its own and cannot read the store: it is read
+     here, once, and handed down. */
+  const nav = await getSiteNav();
+
   return (
     <html
       lang="en"
@@ -27,7 +32,7 @@ export default function SiteLayout({ children }) {
     >
       <body className="flex min-h-svh flex-col">
         <SmoothScrollProvider>
-          <SiteHeader />
+          <SiteHeader links={nav?.links} />
           {children}
         </SmoothScrollProvider>
       </body>

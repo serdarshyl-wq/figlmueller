@@ -1,6 +1,6 @@
 import ServicesCustomMachinery from "@/components/sections/services/ServicesCustomMachinery";
 import PageTransition from "@/components/layout/PageTransition";
-import { getServicePage } from "@/sanity/lib/services";
+import { getOtherServices, getServicePage } from "@/sanity/lib/services";
 import { listingFor } from "@/sanity/lib/site";
 
 /* What this page is called in a search result is written in the studio -
@@ -13,12 +13,15 @@ export const generateMetadata = () =>
   });
 
 export default async function CustomMachineryPage() {
-  const content = await getServicePage("services-custom-machinery");
+  const [content, other] = await Promise.all([
+    getServicePage("services-custom-machinery"),
+    getOtherServices("services-custom-machinery"),
+  ]);
 
   return (
     <PageTransition>
       <main className="flex-1 bg-bone text-black">
-        <ServicesCustomMachinery content={content} />
+        <ServicesCustomMachinery content={content} other={other} />
       </main>
     </PageTransition>
   );

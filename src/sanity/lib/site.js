@@ -24,6 +24,18 @@ const FOOTER = `*[_type == "siteFooter"][0]{
  */
 const LISTINGS = `*[_type == "seoListings"][0].pages[]{ page, title, description }`;
 
+/*
+ * The bar at the top. A panel's pictures come back as plain addresses, because
+ * that is all the panel does with them - it lights one behind the lines.
+ */
+const NAV = `*[_type == "siteNav"][0]{
+  links[]{
+    label,
+    href,
+    submenu[]{ label, href, section, "image": image.asset->url }
+  }
+}`;
+
 const REVALIDATE_SECONDS = 60;
 
 export async function listingFor(route, shipped) {
@@ -43,6 +55,19 @@ export async function listingFor(route, shipped) {
   } catch (error) {
     console.error("[sanity] the search listings could not be read:", error.message);
     return shipped;
+  }
+}
+
+export async function getSiteNav() {
+  try {
+    return await client.fetch(
+      NAV,
+      {},
+      { next: { revalidate: REVALIDATE_SECONDS } }
+    );
+  } catch (error) {
+    console.error("[sanity] the menu could not be read:", error.message);
+    return null;
   }
 }
 

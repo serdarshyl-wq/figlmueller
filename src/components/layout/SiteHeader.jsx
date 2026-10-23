@@ -11,7 +11,7 @@ import LogoLockup from "@/components/brand/LogoLockup";
 import LogoSymbol from "@/components/brand/LogoSymbol";
 import LetsTalkButton from "@/components/layout/LetsTalkButton";
 import NavPanel from "@/components/layout/NavPanel";
-import { NAV_LINKS, NAV_LINKS_LEFT, NAV_LINKS_RIGHT } from "@/config/navigation";
+import { NAV_LINKS } from "@/config/navigation";
 import {
   registerNavLogoSlot,
   useIntroHandedOver,
@@ -50,7 +50,15 @@ const sameBoxes = (a, b) => {
   );
 };
 
-export default function SiteHeader() {
+export default function SiteHeader({ links }) {
+  /* Written in the studio, or the menu the site ships with. It is split the
+     same way either way: the first half to the left of the mark in the
+     middle, the rest to the right. */
+  const navLinks = links?.length ? links : NAV_LINKS;
+  const half = Math.ceil(navLinks.length / 2);
+  const navLeft = navLinks.slice(0, half);
+  const navRight = navLinks.slice(half);
+
   const rootRef = useRef(null);
   const lastScrollRef = useRef(0);
   const sheetExitRef = useRef(0);
@@ -78,7 +86,10 @@ export default function SiteHeader() {
 
   useScrollLock(menuOpen);
 
-  const closeMenu = useCallback(() => setMenuOpen(false), []);
+  /* The setter is listed although React keeps it the same between renders:
+     the compiler reads the dependencies it can see, and an empty list it
+     cannot verify is a memo it refuses to keep. */
+  const closeMenu = useCallback(() => setMenuOpen(false), [setMenuOpen]);
 
   const followFromSheet = useCallback(
     (event, href) => {
@@ -226,7 +237,7 @@ export default function SiteHeader() {
 
   const enterItem = (link) => {
     setHovered(link.href);
-    setOpenPanel(link.submenu ? link.href : null);
+    setOpenPanel(link.submenu?.length ? link.href : null);
   };
 
   const leaveItems = () => {
@@ -249,8 +260,8 @@ export default function SiteHeader() {
           {...rest}
           onClick={leaveItems}
           className="nav-item"
-          aria-expanded={submenu ? activePanel === link.href : undefined}
-          aria-controls={submenu ? panelId(link.href) : undefined}
+          aria-expanded={submenu?.length ? activePanel === link.href : undefined}
+          aria-controls={submenu?.length ? panelId(link.href) : undefined}
         />
       </li>
     );
@@ -274,7 +285,7 @@ export default function SiteHeader() {
         aria-hidden="true"
       />
 
-      {NAV_LINKS.map((link) =>
+      {navLinks.map((link) =>
         ruleBoxes[link.href] ? (
           <span
             key={link.href}
@@ -298,7 +309,7 @@ export default function SiteHeader() {
           }`}
       >
         <ul className="hidden w-full items-center justify-between gap-6 font-display text-base font-medium uppercase tracking-[0.14em] xl:flex 2xl:text-lg">
-          {NAV_LINKS_LEFT.map(renderNavItem)}
+          {navLeft.map(renderNavItem)}
         </ul>
 
         <Link
@@ -322,7 +333,7 @@ export default function SiteHeader() {
         </Link>
 
         <ul className="hidden w-full items-center justify-between gap-6 font-display text-base font-medium uppercase tracking-[0.14em] xl:flex 2xl:text-lg">
-          {NAV_LINKS_RIGHT.map(renderNavItem)}
+          {navRight.map(renderNavItem)}
           <li className="overflow-hidden">
             <LetsTalkButton className="nav-item" />
           </li>
@@ -357,7 +368,7 @@ export default function SiteHeader() {
         </Link>
       </nav>
 
-      {NAV_LINKS.filter((link) => link.submenu).map((link) => (
+      {navLinks.filter((link) => link.submenu?.length).map((link) => (
         <NavPanel
           key={link.href}
           id={panelId(link.href)}
@@ -376,7 +387,7 @@ export default function SiteHeader() {
       >
         <ul className="nav-sheet-list flex flex-col gap-6 font-display text-3xl font-medium uppercase tracking-[0.08em] sm:text-4xl">
 
-          {NAV_LINKS.map(({ submenu, ...link }, index) => (
+          {navLinks.map(({ submenu, ...link }, index) => (
             <li
               key={link.href}
 

@@ -35,7 +35,11 @@ const TIMELINE_END = Math.max(
   LINES_AT + LINES_DURATION
 );
 
-export default function ServicesOther() {
+export default function ServicesOther({ heading, services }) {
+  /* Written in the studio, or what the band ships with. */
+  const words = heading?.length ? heading : HEADING;
+  const others = services?.length ? services : SERVICES;
+
   const rootRef = useRef(null);
   const prefersReducedMotion = useReducedMotion();
   const animated = !prefersReducedMotion;
@@ -163,7 +167,7 @@ export default function ServicesOther() {
               : "font-display text-[clamp(2.5rem,9vw,7rem)] font-semibold uppercase leading-none tracking-[-0.03em]"
           }
         >
-          {HEADING.map((word, index) => (
+          {words.map((word, index) => (
             <span
               key={word}
               className={`other-half block will-change-transform${index === 0 ? " mr-[0.22em]" : ""
@@ -179,7 +183,7 @@ export default function ServicesOther() {
             }`}
         >
           <ul className="flex flex-col items-center text-center">
-            {SERVICES.map((service) => (
+            {others.map((service) => (
               <li
                 key={service.href}
                 className={`other-line${animated ? " will-change-transform" : ""}`}

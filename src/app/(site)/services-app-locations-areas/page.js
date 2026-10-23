@@ -1,6 +1,6 @@
 import ServicesApplications from "@/components/sections/services/ServicesApplications";
 import PageTransition from "@/components/layout/PageTransition";
-import { getServicePage } from "@/sanity/lib/services";
+import { getOtherServices, getServicePage } from "@/sanity/lib/services";
 import { listingFor } from "@/sanity/lib/site";
 
 /* What this page is called in a search result is written in the studio -
@@ -13,12 +13,15 @@ export const generateMetadata = () =>
   });
 
 export default async function ApplicationsPage() {
-  const content = await getServicePage("services-app-locations-areas");
+  const [content, other] = await Promise.all([
+    getServicePage("services-app-locations-areas"),
+    getOtherServices("services-app-locations-areas"),
+  ]);
 
   return (
     <PageTransition>
       <main className="flex-1 bg-bone text-black">
-        <ServicesApplications content={content} />
+        <ServicesApplications content={content} other={other} />
       </main>
     </PageTransition>
   );

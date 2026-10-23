@@ -110,10 +110,17 @@ access to the content, so everything below is done in that console.
 
 The studio's left-hand list is written out in `src/sanity/structure.js` and
 mirrors the site: Homepage, About, Services, Contact, Citrine® Machine,
-Resources, Let's talk, Legal. Section documents are opened by name and cannot be
-created twice; pages that have a route — the service pages, Citrine, the three
-legal pages — are opened by that route. Every field carries a description
-explaining what it does on the page and what it should be given.
+Resources, Let's talk, Legal, and then **Site-wide** — the menu at the top, the
+foot of every page, and the title and description each page is listed under in
+a search result. Section documents are opened by name and cannot be created
+twice; pages that have a route — the service pages, Citrine, the three legal
+pages — are opened by that route. Every field carries a description explaining
+what it does on the page and what it should be given.
+
+There are 29 documents and no drafts. What is still written in code rather than
+in the studio: the words on the Let's talk button (they swap on hover and are
+measured to the pixel), the signature in the footer's right-hand corner, and
+the browser-tab title of the studio itself.
 
 ---
 
@@ -151,13 +158,35 @@ code change is needed.
 - `public/ctrine-dummy/` holds 160 JPEG frames (36 MB). They are the fallback
   for the Citrine section on the home page, used only when no film is written in
   the studio. Once the client's own film is in place they can be deleted.
+- Every picture that carries meaning has an **alt** field beside it in the
+  studio, filled against the placeholder in its place. They describe the
+  picture, so they are rewritten when the picture is.
 - **The three legal pages are drafts.** They were written to match what the site
-  actually does (no analytics, no advertising cookies, one local-storage entry),
-  but they have not been through a lawyer. They must be reviewed before launch.
+  actually does — no analytics, no advertising cookies, nothing stored on the
+  reader's device at all — but they have not been through a lawyer. They must
+  be reviewed before launch.
+- There is **no cookie banner**, on the client's instruction, because there is
+  nothing on the site for one to ask about. Add analytics, an advertising tag
+  or anything that stores something on the reader's device and consent has to
+  come back with it — and the Cookies page says so in writing.
 
 ---
 
-## 6. Shape of the thing
+## 6. Search
+
+- Every page carries one `h1` and no skipped heading levels; the structure is
+  worth re-checking after any section is rebuilt.
+- `/robots.txt` is generated in `src/app/robots.js`: the site is open, `/admin`
+  and `/api/` are not. The studio also sends its own `noindex`.
+- Titles and descriptions are in the studio, under Site-wide → Search listings.
+- **Waiting on the domain**: `metadataBase` and canonical URLs, `sitemap.xml`,
+  Open Graph and Twitter cards with a share image, JSON-LD for the
+  organisation, and Search Console verification. None of them can be written
+  against a URL the site does not have yet.
+
+---
+
+## 7. Shape of the thing
 
 - `src/app/(site)` — the public pages. `src/app/(studio)` — the studio. They are
   separate route groups with separate root layouts.

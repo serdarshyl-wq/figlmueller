@@ -10,6 +10,19 @@ import { line, lines, section } from "../fields";
  */
 export const allServices = section("servicesIndex", "All services", [
   line("heading", "Title", 30, "Read once above the three cards."),
+  /*
+   * The band at the foot of each service page. Only its two words are written
+   * here: what is listed under them is the other service pages, read with the
+   * names they are given on their own heads, so a page renamed is renamed
+   * everywhere it is pointed to.
+   */
+  lines(
+    "otherHeading",
+    "The band at the foot of a service page",
+    2,
+    14,
+    "Two words, set as wide as the screen with the other services listed over them. What is listed is the other two pages, under the names they carry themselves."
+  ),
   {
     name: "cards",
     title: "The three cards",

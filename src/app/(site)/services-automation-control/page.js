@@ -1,6 +1,6 @@
 import ServicesAutomationControl from "@/components/sections/services/ServicesAutomationControl";
 import PageTransition from "@/components/layout/PageTransition";
-import { getServicePage } from "@/sanity/lib/services";
+import { getOtherServices, getServicePage } from "@/sanity/lib/services";
 import { listingFor } from "@/sanity/lib/site";
 
 /* What this page is called in a search result is written in the studio -
@@ -13,12 +13,15 @@ export const generateMetadata = () =>
   });
 
 export default async function AutomationControlPage() {
-  const content = await getServicePage("services-automation-control");
+  const [content, other] = await Promise.all([
+    getServicePage("services-automation-control"),
+    getOtherServices("services-automation-control"),
+  ]);
 
   return (
     <PageTransition>
       <main className="flex-1 bg-bone text-black">
-        <ServicesAutomationControl content={content} />
+        <ServicesAutomationControl content={content} other={other} />
       </main>
     </PageTransition>
   );

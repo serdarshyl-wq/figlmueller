@@ -34,6 +34,10 @@ const FALLBACK = {
 };
 
 const HANDOVER_AT = 6;
+
+/* Twice as long as the hand-over can ever take, and then the page is the
+   reader's whatever the film is doing. */
+const HELD_AT_MOST_MS = 12000;
 const VIDEO_SCALE = 1.1;
 
 /* How much of the film a reader arriving from another page is given: the last
@@ -106,11 +110,17 @@ export default function HeroIntro({ content }) {
 
   useScrollLock(!unlocked, { resetToTop: true });
 
-  const handOver = useCallback(() => {
-    setHandedOver(true);
-    markIntroHandedOver();
-  }, []);
-
+  /*
+   * Handing the page over and letting go of it are the same moment.
+   *
+   * The hold is there so the intro is not scrolled out from under itself
+   * before it has handed anything over. Once the logo is on its way to the bar
+   * and the headline is in, the reader has the page - whatever the film has
+   * left to play. Tying the hold to the end of the film instead made the wait
+   * as long as whatever was uploaded, and a film that stalled on a phone
+   * never ended at all: a black screen that could not be scrolled, skipped or
+   * pulled down to refresh.
+   */
   const release = useCallback(() => {
     setHandedOver(true);
     setUnlocked(true);
@@ -193,7 +203,17 @@ export default function HeroIntro({ content }) {
       };
     }
 
+    /*
+     * And a last resort. The hand-over is read off the film as it plays, so a
+     * film that never gets going - a phone that refuses to play it, a
+     * connection that stalls halfway - would hold the page for ever. After
+     * this long the page is let go of whatever the film is doing.
+     */
+    const given = window.setTimeout(release, HELD_AT_MOST_MS);
+
     video.play().catch(release);
+
+    return () => window.clearTimeout(given);
   }, [release, prefersReducedMotion, navigated]);
 
   const handleTimeUpdate = useCallback(() => {
@@ -202,8 +222,8 @@ export default function HeroIntro({ content }) {
     if (video.currentTime < handoverAt(video)) return;
 
     video.playbackRate = 1;
-    handOver();
-  }, [handedOver, handOver]);
+    release();
+  }, [handedOver, release]);
 
   const skipIntro = useCallback(() => {
     const video = videoRef.current;
@@ -211,7 +231,7 @@ export default function HeroIntro({ content }) {
     setSkipped(true);
 
     if (!video || video.currentTime >= handoverAt(video)) {
-      handOver();
+      release();
       return;
     }
 
@@ -251,7 +271,7 @@ export default function HeroIntro({ content }) {
             ease: "power2.inOut",
           });
         }
-        handOver();
+        release();
         return;
       }
 
@@ -259,7 +279,7 @@ export default function HeroIntro({ content }) {
     };
 
     skipWatchRef.current = requestAnimationFrame(watch);
-  }, [handOver, release]);
+  }, [release]);
 
   useEffect(() => () => cancelAnimationFrame(skipWatchRef.current), []);
 
